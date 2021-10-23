@@ -3,6 +3,13 @@ extra-source-files: []
 dependencies:
   - base
   - extra
+  - parsec
+  - megaparsec
+  - replace-megaparsec
+  - containers
+  - template-haskell
+  - string-interpolate
+  - text
 default-extensions:
   - TupleSections
   - DuplicateRecordFields
