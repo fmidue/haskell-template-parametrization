@@ -10,6 +10,9 @@ dependencies:
   - template-haskell
   - string-interpolate
   - text
+  - ghc
+  - ghc-paths
+  - directory
 default-extensions:
   - TupleSections
   - DuplicateRecordFields
