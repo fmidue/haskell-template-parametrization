@@ -45,3 +45,4 @@ cabal.project.local~
 .ghc.environment.*
 
 Test.hs
+output/

@@ -5,8 +5,7 @@ import Task ( task, combineToString )
 
 testQQ :: IO ()
 testQQ = do
-    let x = [task|task = return "23"
-theModulus {
+    let x = [task|theModulus {
 module Snippet (theModulus) where
 
 import Test.QuickCheck.Gen
@@ -20,17 +19,29 @@ is_prime 1 = False
 is_prime 2 = True
 is_prime n | (length [x | x <- [2 .. n-1], mod n x == 0]) > 0 = False
            | otherwise = True
+
+}
+
+test2 = return "TEST"
+
+test {
+module Snippet (test) where
+
+test :: IO String
+test = return "Wert: #{theModulus}"
+
 }
 -------
 module Main where
 
 import Test.QuickCheck
 
-{- Recall the stuff from lecture slide 123. Also, remember Task #{task} 
 from last week. Here is a function:
+
 #{theModulus}
-#{theModulus}
-#{theModulus}
+#{test}
+#{test2}
+
 -}
 
 original :: [Integer] -> Integer
@@ -116,3 +127,4 @@ test = ...
 {- possibly further modules ... -}|]
     res <- combineToString x
     print res
+    print x

@@ -13,6 +13,7 @@ dependencies:
   - ghc
   - ghc-paths
   - directory
+  - filepath
 default-extensions:
   - TupleSections
   - DuplicateRecordFields

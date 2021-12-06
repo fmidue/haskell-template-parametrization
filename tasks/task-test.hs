@@ -1,4 +1,3 @@
-task = return "23"
 theModulus {
 module Snippet (theModulus) where
 
@@ -14,6 +13,8 @@ is_prime 2 = True
 is_prime n | (length [x | x <- [2 .. n-1], mod n x == 0]) > 0 = False
            | otherwise = True
 }
+slide = return "123"
+task = return "11"
 -------
 module Main where
 
