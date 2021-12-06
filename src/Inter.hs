@@ -26,12 +26,12 @@ import GHC
 import GHC.Paths ( libdir )
 import Unsafe.Coerce ( unsafeCoerce )
 import Control.Exception ( finally )
+import Control.Monad (join)
 
 interFile :: String -> String -> IO String
 interFile name code = do
     tmp <- createTempFile code
-    value <- finally (inter name tmp) (removeFile tmp)
-    value
+    join $ finally (inter name tmp) (removeFile tmp)
 
 
 inter :: String -> FilePath -> IO (IO String)

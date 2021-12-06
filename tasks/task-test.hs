@@ -1,6 +1,19 @@
-## Static
-task = 45
-modulus = 11
+task = return "23"
+theModulus {
+module Snippet (theModulus) where
+
+import Test.QuickCheck.Gen
+
+theModulus = do 
+    x <- generate $ choose (5, 20) `suchThat` is_prime
+    return (show x)
+
+is_prime :: Int -> Bool
+is_prime 1 = False
+is_prime 2 = True
+is_prime n | (length [x | x <- [2 .. n-1], mod n x == 0]) > 0 = False
+           | otherwise = True
+}
 -------
 module Main where
 
@@ -15,7 +28,7 @@ original :: [Integer] -> Integer
 
 original [] = 7
 
-original (x:xs) | (x `mod` #{modulus}) == 0 = 13 + original xs
+original (x:xs) | (x `mod` #{theModulus}) == 0 = 13 + original xs
 
 | otherwise = x * original xs
 

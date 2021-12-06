@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
 module TestQQ (testQQ) where
 
-import Task ( task, combine )
+import Task ( task, combineToString )
 
 testQQ :: IO ()
 testQQ = do
@@ -28,7 +28,9 @@ import Test.QuickCheck
 
 {- Recall the stuff from lecture slide 123. Also, remember Task #{task} 
 from last week. Here is a function:
-
+#{theModulus}
+#{theModulus}
+#{theModulus}
 -}
 
 original :: [Integer] -> Integer
@@ -112,5 +114,5 @@ test = ...
 --------------
 
 {- possibly further modules ... -}|]
-    res <- combine x x
+    res <- combineToString x
     print res
