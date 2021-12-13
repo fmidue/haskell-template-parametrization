@@ -24,7 +24,8 @@ default-extensions:
   - ScopedTypeVariables
 library:
   source-dirs: src
-  exposed-modules: []
+  exposed-modules:
+    - Task
   ghc-options:
     - -Wall
     - -Werror
@@ -46,3 +47,5 @@ tests:
     dependencies:
       - ba-leon-koth
       - hspec
+      - random
+      - array

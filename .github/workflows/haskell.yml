@@ -95,6 +95,8 @@ jobs:
             ;;
         esac
         set +ex
+    - name: Test
+      run: stack test
       env:
         ARGS: ${{ matrix.plan.resolver }}
         BUILD: ${{ matrix.plan.build }}

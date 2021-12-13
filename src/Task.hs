@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Task (testParser, combineToString, task, loadTask, Task) where
+{-# OPTIONS_GHC -Wno-missing-methods #-}
+module Task (testParser, combineToString, task, loadTask, exercise, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
