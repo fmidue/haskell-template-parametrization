@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-missing-methods #-}
-module Task (testParser, combineToString, task, loadTask, exercise, Task) where
+module Task (testParser, combineToString, task, loadTask, exercise, parseTask, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
@@ -45,6 +45,12 @@ taskExpr str = do
 
 loadTask :: QuasiQuoter
 loadTask = quoteFile task
+
+parseTask :: String -> IO Task
+parseTask str = do
+    case parse exercise "" str of
+        Left err -> error $ show err
+        Right ex -> return ex
 
 placeholder :: Parser Part
 placeholder = string "#{" *> fmap Placeholder (manyTill anyChar (char '}'))
@@ -100,19 +106,19 @@ seperator = skipMany1 newline >> string "---" >> manyTill anyChar newline
 
 exercise :: Parser Task
 exercise = do
-    dat <- dataSection
+    dat <- try dataSection <|> return (Data [])
     rs <- many codeSection
     return $ Task (dat:rs)
 
-combineToString :: Task -> IO String
-combineToString t = combine t t M.empty
+combineToString :: Task -> M.Map String String -> IO (String, M.Map String String)
+combineToString t = combine t t
 
-combine :: Task -> Task -> M.Map String String -> IO String
-combine _ (Task []) _ = return ""
+combine :: Task -> Task -> M.Map String String -> IO (String, M.Map String String)
+combine _ (Task []) m = return ("", m)
 combine t (Task (x:xs)) m = do
     (a, m') <- com t m x
-    b <- combine t (Task xs) m'
-    return (a++b)
+    (b, m'') <- combine t (Task xs) m'
+    return (a++b, m'')
 
 com :: Task -> M.Map String String -> Section -> IO (String, M.Map String String)
 com _ m (Data _) = return ("", m)
@@ -122,8 +128,8 @@ com t m (Code [x]) = do
     return (a, m')
 com t m (Code (x:xs)) = do
     (a, m') <- comm t m x
-    (b, _) <- com t m' (Code xs)
-    return (a++b, m')
+    (b, m'') <- com t m' (Code xs)
+    return (a++b, m'')
 
 comm :: Task -> M.Map String String -> Part -> IO (String, M.Map String String)
 comm _ m (Rest x) = return (x, m)
@@ -136,7 +142,7 @@ getDataFromTask :: String -> Task -> M.Map String String -> IO String
 getDataFromTask _ (Task []) _ = return "-- Placeholder not defined --"
 getDataFromTask ph t@(Task (x:xs)) m = case x of
     Data d -> case find (\(name, _) -> ph == name) d of
-                                  Just (n, y) -> do 
+                                  Just (n, y) -> do
                                       content <- concatIO $ map (comm t m) y
                                       interFile n content
                                   Nothing -> return "-- Placeholder not defined --"
@@ -144,7 +150,7 @@ getDataFromTask ph t@(Task (x:xs)) m = case x of
 
 concatIO :: [IO (String, M.Map String String)] -> IO String
 concatIO [] = return ""
-concatIO (x:xs) = do 
+concatIO (x:xs) = do
     (content, _) <- x
     y <- concatIO xs
     return (content ++ y)

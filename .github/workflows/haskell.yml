@@ -96,7 +96,9 @@ jobs:
         esac
         set +ex
     - name: Test
-      run: stack test
+      run: |
+        stack test --coverage
+        stack hpc report --all --open
       env:
         ARGS: ${{ matrix.plan.resolver }}
         BUILD: ${{ matrix.plan.build }}
