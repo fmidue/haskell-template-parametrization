@@ -7,6 +7,9 @@ import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.FilePath.Posix ( takeDirectory, takeFileName )
 import Data.List (isSuffixOf)
 import qualified Data.Map as M
+import Default (with, seed)
+import Postprocessor (whitespaceWatermarking)
+import Seed (stringToSeed)
 
 loadTasksFromFiles :: FilePath -> IO ()
 loadTasksFromFiles folder = do
@@ -31,11 +34,12 @@ evalTasksAndSolutions :: [(FilePath, FilePath)] -> IO ()
 evalTasksAndSolutions [] = print "Converted all Files!"
 evalTasksAndSolutions ((x, y):xs) = do 
     tFileContent <- readFile x
-    task <- parseTask tFileContent
-    (taskOutput, taskMap) <- combineToString task M.empty
+    task  <- parseTask tFileContent
+    task' <- task `with` [seed]
+    (taskOutput, taskMap) <- combineToString task' M.empty
     sFileContent <- readFile y
     solution <- parseTask sFileContent
     (solutionOutput, _) <- combineToString solution taskMap
-    writeFile ("output/tasks/" ++ takeFileName x) taskOutput
+    writeFile ("output/tasks/" ++ takeFileName x) (whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")))
     writeFile ("output/solutions/" ++ takeFileName x) solutionOutput
     evalTasksAndSolutions xs

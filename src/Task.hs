@@ -1,6 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-missing-methods #-}
-module Task (testParser, combineToString, task, loadTask, exercise, parseTask, Task) where
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+module Task (testParser, combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
@@ -145,8 +146,28 @@ getDataFromTask ph t@(Task (x:xs)) m = case x of
                                   Just (n, y) -> do
                                       content <- concatIO $ map (comm t m) y
                                       interFile n content
-                                  Nothing -> return "-- Placeholder not defined --"
+                                  Nothing -> getDataFromTask ph (Task xs) m
     Code _ -> getDataFromTask ph (Task xs) m
+
+containsVar :: String -> Task -> Bool
+containsVar ph (Task sections) = any f sections
+   where f x = case x of
+          Data d -> case find (\(name, _) -> ph == name) d of
+            Just _ -> True
+            Nothing -> False
+          Code _ -> False
+
+addVar :: (String, [Part]) -> Task -> Task
+addVar (name, content) (Task sections) = Task (Data [(name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " = return \"") : content ++ [Rest "\""])] : sections)
+
+addRawVar :: (String, [Part]) -> Task -> Task
+addRawVar (name, content) (Task sections) = Task (Data [(name, content)] : sections)
+
+addSimpleVar :: (String, String) -> Task -> Task
+addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " = return \"") ++ content ++ "\"")])] : sections)
+
+addSimpleRawVar :: (String, String) -> Task -> Task
+addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
 
 concatIO :: [IO (String, M.Map String String)] -> IO String
 concatIO [] = return ""

@@ -2,7 +2,7 @@
 module TestQQ (testQQ) where
 
 import qualified Data.Map as M
-import Task ( task, combineToString )
+import Task ( task, combineToString, addSimpleVar )
 
 testQQ :: IO ()
 testQQ = do
@@ -23,6 +23,7 @@ import Prelude hiding (($))
 -- Consider the examples from the lecture and also look up how to
 -- produce and transform relevant shapes in the CodeWorld
 -- documentation. #{test} #{test3}
+-- #{var}
 
 scene :: Picture
 scene = translated 0 6 (colored yellow (solidCircle 1)) & colored green (solidRectangle 20 2)
@@ -30,6 +31,7 @@ scene = translated 0 6 (colored yellow (solidCircle 1)) & colored green (solidRe
 main :: IO ()
 main = drawingOf scene
 |]
-    res <- combineToString x M.empty
+    let z = addSimpleVar ("var", "22 :: Integer") x
+    res <- combineToString z M.empty
     print res
-    print x
+    print z

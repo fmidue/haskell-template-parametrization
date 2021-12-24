@@ -4,16 +4,14 @@ dependencies:
   - base
   - extra
   - parsec
-  - megaparsec
-  - replace-megaparsec
-  - containers
   - template-haskell
-  - string-interpolate
+  - containers
   - text
   - ghc
   - ghc-paths
   - directory
   - filepath
+  - time
 default-extensions:
   - TupleSections
   - DuplicateRecordFields
