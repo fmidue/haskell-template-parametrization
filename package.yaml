@@ -24,6 +24,7 @@ library:
   source-dirs: src
   exposed-modules:
     - Task
+    - Fileloader
   ghc-options:
     - -Wall
     - -Werror

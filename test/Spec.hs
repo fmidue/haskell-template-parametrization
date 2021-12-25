@@ -12,6 +12,7 @@ import Text.Parsec (parse)
 import Task (exercise, Task)
 import Text.Printf (printf)
 import Control.Exception (evaluate)
+import Fileloader (loadAllTasks)
 
 
 main :: IO ()
@@ -20,6 +21,9 @@ main = hspec $ do
                 it "should not throw any exception" $ do
                         r <- buildRandomTask
                         parse exercise "" r `shouldNotSatisfy` isParseError
+        describe "parse prebuild task" $ do
+                it "should not throw any exception" $ do
+                        loadAllTasks "testExamples"
 
 isParseError :: Either a b -> Bool
 isParseError (Left err) = True 

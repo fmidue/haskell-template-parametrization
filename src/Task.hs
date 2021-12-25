@@ -1,11 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-missing-methods #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
-module Task (testParser, combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
+module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
-import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, parseTest, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf, skipMany1)
+import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf, skipMany1)
 import Language.Haskell.TH.Syntax (Lift (lift))
 import Text.Parsec.String (Parser)
 import Data.List (find)
@@ -175,6 +174,3 @@ concatIO (x:xs) = do
     (content, _) <- x
     y <- concatIO xs
     return (content ++ y)
-
-testParser :: IO ()
-testParser = parseTest exercise "task = return \"23\"\r\ntheModulus {\r\nmodule Snippet (theModulus) where\n\nimport Test.QuickCheck.Gen\n\ntheModulus = do \n    x <- generate $ choose (5, 20) `suchThat` is_prime\n    return (show x)\n\nis_prime :: Int -> Bool\nis_prime 1 = False\nis_prime 2 = True\nis_prime n | (length [x | x <- [2 .. n-1], mod n x == 0]) > 0 = False\n           | otherwise = True\r\n}\r\n-------\nmodule Main where\n\nimport Test.QuickCheck\n\n{- Recall the stuff from lec"

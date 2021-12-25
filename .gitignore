@@ -46,4 +46,3 @@ cabal.project.local~
 
 Test.hs
 output/
-testExamples/
