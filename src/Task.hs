@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
-module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, loadAllVars, Task) where
+module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)

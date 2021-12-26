@@ -2,7 +2,7 @@
 
 module Fileloader ( loadTasksFromFiles, loadAllTasks ) where
 
-import Task ( loadTask, combineToString, parseTask, loadAllVars )
+import Task ( loadTask, combineToString, parseTask )
 import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.FilePath.Posix ( takeDirectory, takeFileName )
 import Data.List (isSuffixOf)
@@ -25,9 +25,7 @@ loadAllTasks folder = do
     createDirectoryIfMissing True $ takeDirectory "output/tasks/"
     createDirectoryIfMissing True $ takeDirectory "output/solutions/"
     defaults           <- readFile $ folder ++ "/defaults.hs"
-    defaultTask <- parseTask defaults
-    allVars <- (loadAllVars defaultTask M.empty)
-    print allVars
+    defaultTask        <- parseTask defaults
     (_, defaultVars)   <- combineToString defaultTask M.empty
     tasks              <- getDirectoryContents tasksFolder
     solutions          <- getDirectoryContents solutionsFolder
@@ -38,14 +36,13 @@ loadAllTasks folder = do
 evalTasksAndSolutions :: M.Map String String -> [(FilePath, FilePath)] -> IO ()
 evalTasksAndSolutions _ [] = print "Converted all Files!"
 evalTasksAndSolutions defaults ((x, y):xs) = do 
-    tFileContent <- readFile x
-    task         <- parseTask tFileContent
-    task'        <- task `with` [seed]
+    tFileContent          <- readFile x
+    task                  <- parseTask tFileContent
+    task'                 <- task `with` [seed]
     (taskOutput, taskMap) <- combineToString task' defaults
-    sFileContent <- readFile y
-    solution <- parseTask sFileContent
-    print taskMap
-    (solutionOutput, _) <- combineToString solution taskMap
+    sFileContent          <- readFile y
+    solution              <- parseTask sFileContent
+    (solutionOutput, _)   <- combineToString solution taskMap
     writeFile ("output/tasks/" ++ takeFileName x) (whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")))
     writeFile ("output/solutions/" ++ takeFileName x) solutionOutput
     evalTasksAndSolutions defaults xs
