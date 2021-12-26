@@ -183,6 +183,7 @@ import Prelude hiding (($))
 -- documentation. This is a #{test1} #{seed}
 -- #{test4}
 -- #{test5}
+-- #{example}
 
 scene :: Picture
 scene = undefined

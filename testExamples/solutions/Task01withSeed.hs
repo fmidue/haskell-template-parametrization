@@ -11,6 +11,7 @@ import Prelude hiding (($))
 -- produce and transform relevant shapes in the CodeWorld
 -- documentation. #{test1} #{seed}
 -- #{test4}
+-- #{example}
 
 scene :: Picture
 scene = translated 0 6 (colored yellow (solidCircle 1)) & colored green (solidRectangle 20 2)

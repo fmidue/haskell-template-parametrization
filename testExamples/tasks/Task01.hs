@@ -8,6 +8,7 @@ module Snippet ( test5 ) where
 test5 :: IO String
 test5 = return "TEST5! #{test4}" 
 }
+example = return "OVERRIDE EXAMPLE"
 -----
 configGhcErrors:
 - deprecation
@@ -182,6 +183,7 @@ import Prelude hiding (($))
 -- documentation. This is a #{test1} #{seed}
 -- #{test4}
 -- #{test5}
+-- #{example}
 
 scene :: Picture
 scene = undefined

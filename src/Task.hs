@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
-module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
+module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, loadAllVars, Task) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
@@ -81,7 +81,7 @@ codeSection = do
     return $ Code txt
 
 placeholderDefinitions :: Parser (String, [Part])
-placeholderDefinitions = try placeholderDefinition <|> multilinePlaceholderDefinition
+placeholderDefinitions = try placeholderDefinition <|> try multilinePlaceholderDefinition
 
 placeholderDefinition :: Parser (String, [Part])
 placeholderDefinition = do
@@ -111,7 +111,31 @@ exercise = do
     return $ Task (dat:rs)
 
 combineToString :: Task -> M.Map String String -> IO (String, M.Map String String)
-combineToString t = combine t t
+combineToString t m = do
+    allVars <- loadAllVars t m
+    combine t t allVars
+
+loadAllVars :: Task -> M.Map String String -> IO (M.Map String String)
+loadAllVars t@(Task sections) m = do
+    allVars <- mapM traverseSection sections
+    insertAll (concat allVars)
+    where insertAll []              = return m
+          insertAll ((key, val):xs) = do
+              inter <- interFile key val
+              m' <- insertAll xs
+              return $ M.insert key inter m'
+          traverseSection s = case s of
+                                Data d -> mapM l d
+                                Code _ -> return []
+                                where l (name, []) = return (name, "")
+                                      l (name, x:xs) = case x of
+                                                          Placeholder ph -> do
+                                                              dataFromTask <- getDataFromTask ph t M.empty
+                                                              (_, res) <- l (name, xs)
+                                                              return (name, dataFromTask ++ res)
+                                                          Rest r -> do
+                                                              (_, res) <- l (name, xs)
+                                                              return (name, r ++ res)
 
 combine :: Task -> Task -> M.Map String String -> IO (String, M.Map String String)
 combine _ (Task []) m = return ("", m)
@@ -168,7 +192,7 @@ addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("modul
 addSimpleRawVar :: (String, String) -> Task -> Task
 addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
 
-concatIO :: [IO (String, M.Map String String)] -> IO String
+concatIO :: [IO (String, a)] -> IO String
 concatIO [] = return ""
 concatIO (x:xs) = do
     (content, _) <- x

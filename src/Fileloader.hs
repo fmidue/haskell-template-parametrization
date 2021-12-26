@@ -2,7 +2,7 @@
 
 module Fileloader ( loadTasksFromFiles, loadAllTasks ) where
 
-import Task ( loadTask, combineToString, parseTask )
+import Task ( loadTask, combineToString, parseTask, loadAllVars )
 import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.FilePath.Posix ( takeDirectory, takeFileName )
 import Data.List (isSuffixOf)
@@ -24,22 +24,28 @@ loadAllTasks folder = do
     let solutionsFolder = folder ++ "/solutions"
     createDirectoryIfMissing True $ takeDirectory "output/tasks/"
     createDirectoryIfMissing True $ takeDirectory "output/solutions/"
-    tasks <- getDirectoryContents tasksFolder
-    solutions <- getDirectoryContents solutionsFolder
+    defaults           <- readFile $ folder ++ "/defaults.hs"
+    defaultTask <- parseTask defaults
+    allVars <- (loadAllVars defaultTask M.empty)
+    print allVars
+    (_, defaultVars)   <- combineToString defaultTask M.empty
+    tasks              <- getDirectoryContents tasksFolder
+    solutions          <- getDirectoryContents solutionsFolder
     let allFiles = [(tasksFolder ++ "/" ++ task, solutionsFolder ++ "/" ++ solution) | task <- tasks, solution <- solutions, task == solution, ".hs" `isSuffixOf` task]
-    evalTasksAndSolutions allFiles
+    evalTasksAndSolutions defaultVars allFiles
 
 
-evalTasksAndSolutions :: [(FilePath, FilePath)] -> IO ()
-evalTasksAndSolutions [] = print "Converted all Files!"
-evalTasksAndSolutions ((x, y):xs) = do 
+evalTasksAndSolutions :: M.Map String String -> [(FilePath, FilePath)] -> IO ()
+evalTasksAndSolutions _ [] = print "Converted all Files!"
+evalTasksAndSolutions defaults ((x, y):xs) = do 
     tFileContent <- readFile x
-    task  <- parseTask tFileContent
-    task' <- task `with` [seed]
-    (taskOutput, taskMap) <- combineToString task' M.empty
+    task         <- parseTask tFileContent
+    task'        <- task `with` [seed]
+    (taskOutput, taskMap) <- combineToString task' defaults
     sFileContent <- readFile y
     solution <- parseTask sFileContent
+    print taskMap
     (solutionOutput, _) <- combineToString solution taskMap
     writeFile ("output/tasks/" ++ takeFileName x) (whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")))
     writeFile ("output/solutions/" ++ takeFileName x) solutionOutput
-    evalTasksAndSolutions xs
+    evalTasksAndSolutions defaults xs
