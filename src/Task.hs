@@ -101,14 +101,27 @@ dataSection = do
     d <- manyTill (placeholderDefinitions <* skipMany (string "\r")) (try seperator)
     return $ Data d
 
+defaultSection :: Parser Section
+defaultSection = do
+    d <- many (placeholderDefinitions <* skipMany (string "\r"))
+    return $ Data d
+
 seperator :: Parser String
 seperator = skipMany1 newline >> string "---" >> manyTill anyChar newline
 
 exercise :: Parser Task
 exercise = do
     dat <- try dataSection <|> return (Data [])
-    rs <- many codeSection
-    return $ Task (dat:rs)
+    if dat == Data [] then
+        do
+            d <- defaultSection
+            rs <- many codeSection
+            return $ Task (d:rs)
+    else
+        do
+            rs <- many codeSection
+            return $ Task (dat:rs)
+
 
 combineToString :: Task -> M.Map String String -> IO (String, M.Map String String)
 combineToString t m = do
