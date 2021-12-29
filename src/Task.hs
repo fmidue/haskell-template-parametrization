@@ -123,67 +123,54 @@ exercise = do
             return $ Task (dat:rs)
 
 
-combineToString :: Task -> M.Map String String -> IO (String, M.Map String String)
-combineToString t m = do
-    allVars <- loadAllVars t m
-    combine t t allVars
+combineToString :: Task -> Bool -> M.Map String String -> IO (String, M.Map String String)
+combineToString t isDefaults m = do
+    let t' = if isDefaults then withAllVars t else t
+    combine t' t' M.empty m
 
-loadAllVars :: Task -> M.Map String String -> IO (M.Map String String)
-loadAllVars t@(Task sections) m = do
-    allVars <- mapM traverseSection sections
-    insertAll (concat allVars)
-    where insertAll []              = return m
-          insertAll ((key, val):xs) = do
-              inter <- interFile key val
-              m' <- insertAll xs
-              return $ M.insert key inter m'
-          traverseSection s = case s of
-                                Data d -> mapM l d
-                                Code _ -> return []
-                                where l (name, []) = return (name, "")
-                                      l (name, x:xs) = case x of
-                                                          Placeholder ph -> do
-                                                              dataFromTask <- getDataFromTask ph t M.empty
-                                                              (_, res) <- l (name, xs)
-                                                              return (name, dataFromTask ++ res)
-                                                          Rest r -> do
-                                                              (_, res) <- l (name, xs)
-                                                              return (name, r ++ res)
+withAllVars :: Task -> Task
+withAllVars (Task sections) = Task (sections ++ [Code (map Placeholder (concatMap traverseSection sections))])
 
-combine :: Task -> Task -> M.Map String String -> IO (String, M.Map String String)
-combine _ (Task []) m = return ("", m)
-combine t (Task (x:xs)) m = do
-    (a, m') <- com t m x
-    (b, m'') <- combine t (Task xs) m'
+traverseSection :: Section -> [String]
+traverseSection (Code _) = []
+traverseSection (Data []) = []
+traverseSection (Data ((name, _):xs)) = name:traverseSection (Data xs)
+
+combine :: Task -> Task -> M.Map String String -> M.Map String String -> IO (String, M.Map String String)
+combine _ (Task []) m _ = return ("", m)
+combine t (Task (x:xs)) m ma = do
+    (a, m') <- com t m ma x
+    (b, m'') <- combine t (Task xs) m' ma
     return (a++b, m'')
 
-com :: Task -> M.Map String String -> Section -> IO (String, M.Map String String)
-com _ m (Data _) = return ("", m)
-com _ m (Code []) = return ("", m)
-com t m (Code [x]) = do
-    (a, m') <- comm t m x
+com :: Task -> M.Map String String -> M.Map String String -> Section -> IO (String, M.Map String String)
+com _ m _ (Data _) = return ("", m)
+com _ m _ (Code []) = return ("", m)
+com t m ma (Code [x]) = do
+    (a, m') <- comm t m ma x
     return (a, m')
-com t m (Code (x:xs)) = do
-    (a, m') <- comm t m x
-    (b, m'') <- com t m' (Code xs)
+com t m ma (Code (x:xs)) = do
+    (a, m') <- comm t m ma x
+    (b, m'') <- com t m' ma (Code xs)
     return (a++b, m'')
 
-comm :: Task -> M.Map String String -> Part -> IO (String, M.Map String String)
-comm _ m (Rest x) = return (x, m)
-comm t m (Placeholder x) = if x `elem` M.keys m then return (m M.! x, m) else do
-    dat <- getDataFromTask x t m
-    let m' = M.insert x dat m
-    return (dat, m')
+comm :: Task -> M.Map String String -> M.Map String String -> Part -> IO (String, M.Map String String)
+comm _ m _ (Rest x) = return (x, m)
+comm t m ma (Placeholder x) = if x `elem` M.keys m then return (m M.! x, m) else do
+    (dat, m') <- getDataFromTask x t m ma
+    let m'' = M.insert x dat m'
+    return (dat, m'')
 
-getDataFromTask :: String -> Task -> M.Map String String -> IO String
-getDataFromTask _ (Task []) _ = return "-- Placeholder not defined --"
-getDataFromTask ph t@(Task (x:xs)) m = case x of
+getDataFromTask :: String -> Task -> M.Map String String -> M.Map String String -> IO (String, M.Map String String)
+getDataFromTask ph (Task []) m ma = if ph `elem` M.keys ma then return (ma M.! ph, m) else return ("-- Placeholder not defined --", m)
+getDataFromTask ph t@(Task (x:xs)) m ma = case x of
     Data d -> case find (\(name, _) -> ph == name) d of
                                   Just (n, y) -> do
-                                      content <- concatIO $ map (comm t m) y
-                                      interFile n content
-                                  Nothing -> getDataFromTask ph (Task xs) m
-    Code _ -> getDataFromTask ph (Task xs) m
+                                      (content, m') <- concatIO $ map (comm t m ma) y
+                                      inter <- interFile n content
+                                      return (inter, m')
+                                  Nothing -> getDataFromTask ph (Task xs) m ma
+    Code _ -> getDataFromTask ph (Task xs) m ma
 
 containsVar :: String -> Task -> Bool
 containsVar ph (Task sections) = any f sections
@@ -205,9 +192,9 @@ addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("modul
 addSimpleRawVar :: (String, String) -> Task -> Task
 addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
 
-concatIO :: [IO (String, a)] -> IO String
-concatIO [] = return ""
+concatIO :: [IO (String, M.Map String String)] -> IO (String, M.Map String String)
+concatIO [] = return ("", M.empty )
 concatIO (x:xs) = do
-    (content, _) <- x
-    y <- concatIO xs
-    return (content ++ y)
+    (content, m) <- x
+    (y, m') <- concatIO xs
+    return (content ++ y, M.union m m')

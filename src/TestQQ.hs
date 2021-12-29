@@ -32,6 +32,6 @@ main :: IO ()
 main = drawingOf scene
 |]
     let z = addSimpleVar ("var", "22 :: Integer") x
-    res <- combineToString z M.empty
+    res <- combineToString z False M.empty
     print res
     print z

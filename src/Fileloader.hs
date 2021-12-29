@@ -13,7 +13,7 @@ import Seed (stringToSeed)
 
 loadTasksFromFiles :: FilePath -> IO ()
 loadTasksFromFiles folder = do
-    (t,_) <- combineToString [loadTask|tasks/task-test.hs|] M.empty
+    (t,_) <- combineToString [loadTask|tasks/task-test.hs|] False M.empty
     let path = folder ++ "task-test.hs"
     createDirectoryIfMissing True $ takeDirectory path
     writeFile path t
@@ -26,7 +26,7 @@ loadAllTasks folder = do
     createDirectoryIfMissing True $ takeDirectory "output/solutions/"
     defaults           <- readFile $ folder ++ "/defaults.hs"
     defaultTask        <- parseTask defaults
-    (_, defaultVars)   <- combineToString defaultTask M.empty
+    (_, defaultVars)   <- combineToString defaultTask True M.empty
     tasks              <- getDirectoryContents tasksFolder
     solutions          <- getDirectoryContents solutionsFolder
     let allFiles = [(tasksFolder ++ "/" ++ task, solutionsFolder ++ "/" ++ solution) | task <- tasks, solution <- solutions, task == solution, ".hs" `isSuffixOf` task]
@@ -39,10 +39,10 @@ evalTasksAndSolutions defaults ((x, y):xs) = do
     tFileContent          <- readFile x
     task                  <- parseTask tFileContent
     task'                 <- task `with` [seed]
-    (taskOutput, taskMap) <- combineToString task' defaults
+    (taskOutput, taskMap) <- combineToString task' False defaults
     sFileContent          <- readFile y
     solution              <- parseTask sFileContent
-    (solutionOutput, _)   <- combineToString solution taskMap
+    (solutionOutput, _)   <- combineToString solution False taskMap
     writeFile ("output/tasks/" ++ takeFileName x) (whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")))
     writeFile ("output/solutions/" ++ takeFileName x) solutionOutput
     evalTasksAndSolutions defaults xs

@@ -1,4 +1,4 @@
-test1 = return "TEST1!"
+test1 = return "TEST1! #{theModulus}"
 test2 = return "TEST2! #{test1}"
 test3 = return "TEST3! #{test2}"
 test4 = return "TEST4! #{test3}"
@@ -7,6 +7,21 @@ module Snippet ( test5 ) where
 
 test5 :: IO String
 test5 = return "TEST5! #{test4}" 
+}
+theModulus {
+module Snippet (theModulus) where
+
+import Test.QuickCheck.Gen
+
+theModulus = do
+                x <- generate (choose (5, 20) `suchThat` is_prime)
+                return (show x)
+
+is_prime :: Int -> Bool
+is_prime 1 = False
+is_prime 2 = True
+is_prime n | (length [x | x <- [2 .. n-1], mod n x == 0]) > 0 = False
+		   | otherwise = True
 }
 example = return "OVERRIDE EXAMPLE"
 -----
@@ -183,7 +198,7 @@ import Prelude hiding (($))
 -- documentation. This is a #{test1} #{seed}
 -- #{test4}
 -- #{test5}
--- #{example}
+-- #{example} #{theModulus} #{theModulus} #{theModulus}
 
 scene :: Picture
 scene = undefined
