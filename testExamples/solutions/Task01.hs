@@ -5,12 +5,11 @@ import Prelude hiding (($))
 -- not behind it!
 --
 -- As guidance, the result should look roughly like this:
--- https://code.world/run.html?mode=haskell&dhash=DEpssmhzFT22fqxwW2yXJVQ
+-- https://code.world/run.html?mode=haskell&dhash=#{hash}
 --
--- Consider the examples from the lecture and also look up how to
+-- Consider the examples from the #{watermark} and also look up how to
 -- produce and transform relevant shapes in the CodeWorld
--- documentation. #{test1} #{seed}
--- #{test4}
+-- documentation.
 
 scene :: Picture
 scene = translated 0 6 (colored yellow (solidCircle 1)) & colored green (solidRectangle 20 2)

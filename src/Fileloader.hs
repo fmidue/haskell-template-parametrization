@@ -38,7 +38,7 @@ evalTasksAndSolutions _ [] = print "Converted all Files!"
 evalTasksAndSolutions defaults ((x, y):xs) = do 
     tFileContent          <- readFile x
     task                  <- parseTask tFileContent
-    task'                 <- task `with` [seed]
+    task'                 <- with task defaults [seed]
     (taskOutput, taskMap) <- combineToString task' False defaults
     sFileContent          <- readFile y
     solution              <- parseTask sFileContent

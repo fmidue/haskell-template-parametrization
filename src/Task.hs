@@ -10,6 +10,7 @@ import Text.Parsec.String (Parser)
 import Data.List (find)
 import Inter (interFile)
 import qualified Data.Map as M
+import Seed (stringToSeed, seedToString)
 
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
@@ -128,6 +129,38 @@ combineToString t isDefaults m = do
     let t' = if isDefaults then withAllVars t else t
     combine t' t' M.empty m
 
+{-loadAllVars :: Task -> M.Map String String -> M.Map String String -> IO (M.Map String String)
+loadAllVars t@(Task sections) m ma = do
+    mas <- traverseSection sections ma
+    return $ M.union mas m
+    where insertAll []              = return m
+          insertAll ((key, val):xs) = do
+              inter <- interFile key val
+              m' <- insertAll xs
+              return $ M.insert key inter m'
+          traverseSection [] ma'     = return ma'
+          traverseSection (y:ys) ma' = case y of
+                                Data d -> do
+                                    mas' <- traverseSection ys ma'
+                                    mass' <- k d ma'
+                                    return $ M.union mas' mass'
+                                Code _ -> return ma'
+                                where k [] ma''     = return ma''
+                                      k (z:zs) ma'' = do 
+                                        (name, content) <- l z ma''
+                                        inter <- interFile name content
+                                        mas'' <- k zs ma''
+                                        return $ M.union mas'' (M.insert name inter ma'')
+                                        where l (name, []) _       = return (name, "")
+                                              l (name, x:xs) ma''' = case x of
+                                                          Placeholder ph -> do
+                                                              (dataFromTask, mas''') <- getDataFromTask ph t ma'''
+                                                              (_, res) <- l (name, xs) mas'''
+                                                              return (name, dataFromTask ++ res)
+                                                          Rest r -> do
+                                                              (_, res) <- l (name, xs) ma'''
+                                                              return (name, r ++ res)-}
+
 withAllVars :: Task -> Task
 withAllVars (Task sections) = Task (sections ++ [Code (map Placeholder (concatMap traverseSection sections))])
 
@@ -141,7 +174,7 @@ combine _ (Task []) m _ = return ("", m)
 combine t (Task (x:xs)) m ma = do
     (a, m') <- com t m ma x
     (b, m'') <- combine t (Task xs) m' ma
-    return (a++b, m'')
+    return (a++b, M.union m'' ma)
 
 com :: Task -> M.Map String String -> M.Map String String -> Section -> IO (String, M.Map String String)
 com _ m _ (Data _) = return ("", m)
@@ -158,8 +191,9 @@ comm :: Task -> M.Map String String -> M.Map String String -> Part -> IO (String
 comm _ m _ (Rest x) = return (x, m)
 comm t m ma (Placeholder x) = if x `elem` M.keys m then return (m M.! x, m) else do
     (dat, m') <- getDataFromTask x t m ma
-    let m'' = M.insert x dat m'
-    return (dat, m'')
+    let modified = modifyVar x dat
+    let m'' = M.insert x modified m'
+    return (modified, m'')
 
 getDataFromTask :: String -> Task -> M.Map String String -> M.Map String String -> IO (String, M.Map String String)
 getDataFromTask ph (Task []) m ma = if ph `elem` M.keys ma then return (ma M.! ph, m) else return ("-- Placeholder not defined --", m)
@@ -191,6 +225,10 @@ addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("modul
 
 addSimpleRawVar :: (String, String) -> Task -> Task
 addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
+
+modifyVar :: String -> String -> String 
+modifyVar name content | name == "seed" = seedToString $ stringToSeed content
+                       | otherwise = content
 
 concatIO :: [IO (String, M.Map String String)] -> IO (String, M.Map String String)
 concatIO [] = return ("", M.empty )

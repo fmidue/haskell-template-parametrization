@@ -1,5 +1,5 @@
-module Seed (intListToSeed, stringToSeed, Seed(..)) where
-import Data.Char (ord)
+module Seed (intListToSeed, stringToSeed, seedToString, Seed(..)) where
+import Data.Char (ord, digitToInt, isDigit)
 
 newtype Seed = Seed [Int] deriving (Show, Eq)
 
@@ -13,5 +13,9 @@ intListToSeed seed | l == 8    = Seed $ map (`mod` 10) seed
 stringToSeed :: String -> Seed
 stringToSeed str = intListToSeed $ map charToDigit str
 
+seedToString :: Seed -> String
+seedToString (Seed []) = ""
+seedToString (Seed (x:xs)) = show x ++ seedToString (Seed xs)
+
 charToDigit :: Char -> Int
-charToDigit c = mod (ord c) 10
+charToDigit c = if isDigit c then digitToInt c else mod (ord c) 10

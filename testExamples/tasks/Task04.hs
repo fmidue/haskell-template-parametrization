@@ -1,15 +1,32 @@
-test1 = return "TEST1!"
-test2 = return "TEST2! #{test1}"
-test3 = return "TEST3! #{test2}"
-test4 = return "TEST4! #{test3}"
-test5 {
-module Snippet ( test5 ) where
+seed = return "Student A"
+krone {
+module Snippet (krone) where
 
-test5 :: IO String
-test5 = return "TEST5! #{test4}" 
+import Test.QuickCheck.Gen
+import Test.QuickCheck.Random (mkQCGen)
+
+krone :: IO String
+krone = return $ unGen ( elements ["leaves/crown", "crown/leaves"] ) (mkQCGen #{seed}) 0
 }
-seed = return "TSEED"
------
+help {
+module Snippet (help) where
+
+import Test.QuickCheck.Gen
+import Test.QuickCheck.Random (mkQCGen)
+
+help :: IO String
+help = return $ unGen ( elements ["help", "hint"] ) (mkQCGen #{seed}1) 0
+}
+verb {
+module Snippet (verb) where
+
+import Test.QuickCheck.Gen
+import Test.QuickCheck.Random (mkQCGen)
+
+verb :: IO String
+verb = return $ unGen ( elements ["is", "gets"] ) (mkQCGen #{seed}32) 0
+}
+------
 configGhcErrors:
 - deprecation
 - empty-enumerations
@@ -25,6 +42,7 @@ configHlintErrors:
 - Length always non-negative
 - Move brackets to avoid $
 - Redundant $
+- Redundant bracket
 - Redundant flip
 - Redundant fromInteger
 - Redundant fromIntegral
@@ -88,10 +106,13 @@ allowModifying: false
 allowRemoving: false
 configHlintGroups:
 - codeworld
-- monomorphic
 - teaching
+- monomorphic
 # QuickCheck/HUnit testing follows the template check
 configGhcWarnings:
+- incomplete-patterns
+- incomplete-uni-patterns
+- missing-signatures
 - unused-local-binds
 - unused-matches
 - unused-pattern-binds
@@ -106,7 +127,7 @@ configHlintSuggestions:
 - Apply De Morgan law
 - Avoid lambda
 - Avoid lambda using `infix`
-- Eta reduce
+# - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
@@ -114,11 +135,14 @@ configHlintSuggestions:
 - Move guards forward
 - Move map inside list comprehension
 - Reduce duplication
-- Redundant bracket
+- Redundant /=
+- Redundant ==
+- Redundant if
 - Redundant take
 - Replace a fold by a strict fold
 - Too strict if
 - Too strict maybe
+- Use &&
 - Use ++
 - Use 1
 - Use all
@@ -140,6 +164,8 @@ configHlintSuggestions:
 - Use foldl
 - Use foldr
 - Use fromMaybe
+- Use guards
+- Use if
 - Use infix
 - Use lefts
 - Use lighter
@@ -160,6 +186,7 @@ configHlintSuggestions:
 - Use tail
 - Use tuple-section
 # - Use uncurry
+- Use ||
 configLanguageExtensions:
 - NoTemplateHaskell
 - TupleSections
@@ -171,25 +198,45 @@ configLanguageExtensions:
 ----------
 import CodeWorld
 import Prelude hiding (($))
+import Data.Text (pack)
 
--- Draw a yellow solid circle and a green solid rectangle below it -
--- not behind it!
+-- Extend your tree from last week with a short shaking animation you
+-- would see when the #{krone} get hit by some wind. Only the
+-- leaves and branches should move and the motion should stop after a
+-- few seconds (but the program keep running). Make sure that there
+-- are no apparent jumps in your animation.
 --
--- As guidance, the result should look roughly like this:
--- https://code.world/run.html?mode=haskell&dhash=DEpssmhzFT22fqxwW2yXJVQ
+-- It could look something like this:
 --
--- Consider the examples from the lecture and also look up how to
--- produce and transform relevant shapes in the CodeWorld
--- documentation. This is a #{test1} #{seed}
--- #{test4}
--- #{test5}
--- #{example}
+--   https://code.world/run.html?mode=haskell&dhash=Do2vyh7eJauHPLmL9QI2AHQ
+--
+-- Hint: Note that 'tree' is now a function from Double to Picture as
+--       opposed to just a Picture in last week's task. This
+--       additional parameter, here named t, is the number of seconds
+--       elapsed since the animation started. As additional #{help}, the
+--       current value for t #{verb} displayed by the given template
+--       (confirming that the program keeps running).
 
-scene :: Picture
-scene = undefined
+tree :: Double -> Picture
+tree t = undefined
+
+-- Do not change the stuff below here!
+
+scene :: Double -> Picture
+scene t =
+  countTime t &
+  tree t
 
 main :: IO ()
-main = drawingOf scene
+main = animationOf scene
+
+countTime :: Double -> Picture
+countTime t = dilated 0.5 (translated 5 0 (lettering (pack ("t = " ++ truncatedTime t))))
+
+truncatedTime :: Double -> String
+truncatedTime t =
+  let (n,f) = properFraction t
+  in show (n :: Int) ++ take 3 (tail (show f))
 ----------
 module Test (test) where
 import qualified Main
@@ -199,5 +246,5 @@ import TestHelper (isDeeplyDefined)
 
 test :: [ Test ]
 test =
-  [ "scene =/= undefined?" ~: isDeeplyDefined Main.scene
+  [ "tree =/= undefined?" ~: isDeeplyDefined (Main.tree 1.0)
   ]

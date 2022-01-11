@@ -12,6 +12,8 @@ dependencies:
   - directory
   - filepath
   - time
+  - random
+  - QuickCheck
 default-extensions:
   - TupleSections
   - DuplicateRecordFields

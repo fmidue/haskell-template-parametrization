@@ -45,4 +45,6 @@ cabal.project.local~
 .ghc.environment.*
 
 Test.hs
+Ex.hs
 output/
+old/
