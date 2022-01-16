@@ -13,6 +13,8 @@ import Inter (interFile)
 import qualified Data.Map as M
 import Seed (stringToSeed, seedToString)
 import Data.List.Extra (splitOn)
+import qualified DataBuilder as D
+import qualified DataBuilder as D
 
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
@@ -203,6 +205,7 @@ addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest conte
 modifyVarPre :: String -> [Part] -> (String, [Part])
 modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\nimport Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen (") : content ++ [Rest " ) (mkQCGen ", Placeholder "seed", Rest ") 0)"])
                           | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ (Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content))
+                          | "gen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ D.asString ++ "\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ generateData "):content)
                           | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
                           where normalizedName = head sname
                                 sname = splitOn ":" name
