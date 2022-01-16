@@ -1,16 +1,18 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
-module Task (combineToString, task, loadTask, exercise, parseTask, addSimpleVar, containsVar, Task) where
+{-# OPTIONS_GHC -Wno-missing-methods #-}
+module Task (combineToString, task, exercise, parseTask, addSimpleVar, containsVar, Task) where
 
-import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter), quoteFile )
+import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter) )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
 import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf, skipMany1)
 import Language.Haskell.TH.Syntax (Lift (lift))
 import Text.Parsec.String (Parser)
-import Data.List (find)
+import Data.List (find, isPrefixOf, isInfixOf, intersperse)
 import Inter (interFile)
 import qualified Data.Map as M
 import Seed (stringToSeed, seedToString)
+import Data.List.Extra (splitOn)
 
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
@@ -44,11 +46,8 @@ taskExpr str = do
         Left err -> error $ show err
         Right ex -> [| ex |]
 
-loadTask :: QuasiQuoter
-loadTask = quoteFile task
-
 parseTask :: String -> IO Task
-parseTask str = do
+parseTask str =
     case parse exercise "" str of
         Left err -> error $ show err
         Right ex -> return ex
@@ -89,7 +88,7 @@ placeholderDefinition = do
     n <- skipMany newline >> manyTill (noneOf "\n") (char '=')
     code <- manyTill singlelinePart (lookAhead newline)
     let name = filter (/=' ') n
-    return (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):code)
+    return $ modifyVarPre name code
 
 multilinePlaceholderDefinition :: Parser (String, [Part])
 multilinePlaceholderDefinition = do
@@ -126,43 +125,18 @@ exercise = do
 
 combineToString :: Task -> Bool -> M.Map String String -> IO (String, M.Map String String)
 combineToString t isDefaults m = do
-    let t' = if isDefaults then withAllVars t else t
-    combine t' t' M.empty m
+    let t' = if isDefaults then withAllVars t else withDefaultVars t
+    (output, taskMap) <- combine t' t' M.empty m
+    return (unlines (init (lines output)), taskMap)
 
-{-loadAllVars :: Task -> M.Map String String -> M.Map String String -> IO (M.Map String String)
-loadAllVars t@(Task sections) m ma = do
-    mas <- traverseSection sections ma
-    return $ M.union mas m
-    where insertAll []              = return m
-          insertAll ((key, val):xs) = do
-              inter <- interFile key val
-              m' <- insertAll xs
-              return $ M.insert key inter m'
-          traverseSection [] ma'     = return ma'
-          traverseSection (y:ys) ma' = case y of
-                                Data d -> do
-                                    mas' <- traverseSection ys ma'
-                                    mass' <- k d ma'
-                                    return $ M.union mas' mass'
-                                Code _ -> return ma'
-                                where k [] ma''     = return ma''
-                                      k (z:zs) ma'' = do 
-                                        (name, content) <- l z ma''
-                                        inter <- interFile name content
-                                        mas'' <- k zs ma''
-                                        return $ M.union mas'' (M.insert name inter ma'')
-                                        where l (name, []) _       = return (name, "")
-                                              l (name, x:xs) ma''' = case x of
-                                                          Placeholder ph -> do
-                                                              (dataFromTask, mas''') <- getDataFromTask ph t ma'''
-                                                              (_, res) <- l (name, xs) mas'''
-                                                              return (name, dataFromTask ++ res)
-                                                          Rest r -> do
-                                                              (_, res) <- l (name, xs) ma'''
-                                                              return (name, r ++ res)-}
+defaultNames :: [String]
+defaultNames = ["seed", "enableWhitespaceWatermarking"]
 
 withAllVars :: Task -> Task
 withAllVars (Task sections) = Task (sections ++ [Code (map Placeholder (concatMap traverseSection sections))])
+
+withDefaultVars :: Task -> Task
+withDefaultVars (Task sections) = Task (sections ++ [Code (Rest "\n-- " : map Placeholder defaultNames)])
 
 traverseSection :: Section -> [String]
 traverseSection (Code _) = []
@@ -196,7 +170,7 @@ comm t m ma (Placeholder x) = if x `elem` M.keys m then return (m M.! x, m) else
     return (modified, m'')
 
 getDataFromTask :: String -> Task -> M.Map String String -> M.Map String String -> IO (String, M.Map String String)
-getDataFromTask ph (Task []) m ma = if ph `elem` M.keys ma then return (ma M.! ph, m) else return ("-- Placeholder not defined --", m)
+getDataFromTask ph (Task []) m ma = if ph `elem` M.keys ma then return (ma M.! ph, m) else return ("-- Placeholder '" ++ ph ++ "' not defined --", m)
 getDataFromTask ph t@(Task (x:xs)) m ma = case x of
     Data d -> case find (\(name, _) -> ph == name) d of
                                   Just (n, y) -> do
@@ -226,7 +200,14 @@ addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("modul
 addSimpleRawVar :: (String, String) -> Task -> Task
 addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
 
-modifyVar :: String -> String -> String 
+modifyVarPre :: String -> [Part] -> (String, [Part])
+modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\nimport Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen (") : content ++ [Rest " ) (mkQCGen ", Placeholder "seed", Rest ") 0)"])
+                          | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ (Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content))
+                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
+                          where normalizedName = head sname
+                                sname = splitOn ":" name
+
+modifyVar :: String -> String -> String
 modifyVar name content | name == "seed" = seedToString $ stringToSeed content
                        | otherwise = content
 

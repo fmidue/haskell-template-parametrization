@@ -1,3 +1,4 @@
+enableWhitespaceWatermarking = return "True"
 hash = return "DEpssmhzFT22fqxwW2yXJVQ"
 -------
 configGhcErrors:

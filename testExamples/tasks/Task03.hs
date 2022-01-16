@@ -1,16 +1,7 @@
-seed = return "Student A"
-imports = return "import Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)"
-ungen_krone = elements ["leaves/crown", "crown/leaves"]
-help:imports = return $ unGen ( elements ["help", "hint"] ) (mkQCGen #{seed}1) 0
-verb {
-module Snippet (verb) where
-
-#{imports}
-
-verb :: IO String
-verb = return $ unGen ( elements ["is", "gets"] ) (mkQCGen #{seed}32) 0
-}
-------
+ungen_zoom = elements [0.4, 0.5, 0.6]
+ungen_x = chooseInt (12,18)
+ungen_y = chooseInt (-4,-8)
+-----
 configGhcErrors:
 - deprecation
 - empty-enumerations
@@ -184,38 +175,51 @@ import CodeWorld
 import Prelude hiding (($))
 import Data.Text (pack)
 
--- Extend your tree from last week with a short shaking animation you
--- would see when the #{ungen_krone} get hit by some wind. Only the
--- leaves and branches should move and the motion should stop after a
--- few seconds (but the program keep running). Make sure that there
--- are no apparent jumps in your animation.
+-- Draw a rising, moving, then setting sun, as in the sample animation
+-- https://code.world/run.html?mode=haskell&dhash=DYBPZOMntsydDgOvvqQNsPQ
 --
--- It could look something like this:
+-- You need not have the exact same positions of the sun at the
+-- beginning and end as in our sample animation. For example, the sun
+-- can start completely hidden behind the grass line, and can
+-- completely disappear behind the grass line at the end. But after
+-- having set (Sonnenuntergang) it should stay where it is or
+-- completely wink out of existence, not continue to move under the
+-- ground or other strange behavior.
 --
---   https://code.world/run.html?mode=haskell&dhash=Do2vyh7eJauHPLmL9QI2AHQ
+-- Do not try to "cheat" by letting the sun continue to move under the
+-- ground but hiding it behind a white rectangle or anything similar.
 --
--- Hint: Note that 'tree' is now a function from Double to Picture as
+-- You can work with elementary trigonometry for this task. If you
+-- need to refresh your knowledge of trigonometric functions and their
+-- connection to circular motion, you may want to have a look at
+-- https://en.wikipedia.org/wiki/Unit_circle as well as
+-- https://www.geogebra.org/m/Jgt2n9ah
+--
+-- Of course, you can also work with CodeWorld's 'rotated' function
+-- instead.
+--
+-- In any case, note that angles in CodeWorld are measured in radians,
+-- not in degrees.
+--
+-- Hint: Note that 'scene' is now a function from Double to Picture as
 --       opposed to just a Picture in last week's task. This
 --       additional parameter, here named t, is the number of seconds
---       elapsed since the animation started. As additional #{help}, the
---       current value for t #{verb} displayed by the given template
+--       elapsed since the animation started. As additional help, the
+--       current value for t is displayed by the given template
 --       (confirming that the program keeps running).
 
-tree :: Double -> Picture
-tree t = undefined
+scene :: Double -> Picture
+scene t = undefined
 
 -- Do not change the stuff below here!
-
-scene :: Double -> Picture
-scene t =
-  countTime t &
-  tree t
+sceneWithTime :: Double -> Picture
+sceneWithTime t = countTime t & scene t
 
 main :: IO ()
-main = animationOf scene
+main = animationOf sceneWithTime
 
 countTime :: Double -> Picture
-countTime t = dilated 0.5 (translated 5 0 (lettering (pack ("t = " ++ truncatedTime t))))
+countTime t = dilated #{ungen_zoom} (translated #{ungen_x} (#{ungen_y}) (lettering (pack ("t = " ++ truncatedTime t))))
 
 truncatedTime :: Double -> String
 truncatedTime t =
@@ -230,5 +234,5 @@ import TestHelper (isDeeplyDefined)
 
 test :: [ Test ]
 test =
-  [ "tree =/= undefined?" ~: isDeeplyDefined (Main.tree 1.0)
+  [ "scene =/= undefined?" ~: isDeeplyDefined (Main.scene 1.0)
   ]

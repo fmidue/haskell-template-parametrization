@@ -1,22 +1,13 @@
-{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+module Fileloader ( loadAllTasks ) where
 
-module Fileloader ( loadTasksFromFiles, loadAllTasks ) where
-
-import Task ( loadTask, combineToString, parseTask )
+import Task ( combineToString, parseTask )
 import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.FilePath.Posix ( takeDirectory, takeFileName )
 import Data.List (isSuffixOf)
 import qualified Data.Map as M
-import Default (with, seed)
+import Default (with, seed, enableWhitespaceWatermarking)
 import Postprocessor (whitespaceWatermarking)
 import Seed (stringToSeed)
-
-loadTasksFromFiles :: FilePath -> IO ()
-loadTasksFromFiles folder = do
-    (t,_) <- combineToString [loadTask|tasks/task-test.hs|] False M.empty
-    let path = folder ++ "task-test.hs"
-    createDirectoryIfMissing True $ takeDirectory path
-    writeFile path t
 
 loadAllTasks :: FilePath -> IO ()
 loadAllTasks folder = do
@@ -38,11 +29,11 @@ evalTasksAndSolutions _ [] = print "Converted all Files!"
 evalTasksAndSolutions defaults ((x, y):xs) = do 
     tFileContent          <- readFile x
     task                  <- parseTask tFileContent
-    task'                 <- with task defaults [seed]
+    task'                 <- with task defaults [seed, enableWhitespaceWatermarking]
     (taskOutput, taskMap) <- combineToString task' False defaults
     sFileContent          <- readFile y
     solution              <- parseTask sFileContent
     (solutionOutput, _)   <- combineToString solution False taskMap
-    writeFile ("output/tasks/" ++ takeFileName x) (whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")))
+    writeFile ("output/tasks/" ++ takeFileName x) (if taskMap M.! "enableWhitespaceWatermarking" == "True" then whitespaceWatermarking taskOutput (stringToSeed (taskMap M.! "seed")) else taskOutput)
     writeFile ("output/solutions/" ++ takeFileName x) solutionOutput
     evalTasksAndSolutions defaults xs
