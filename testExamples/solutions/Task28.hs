@@ -1,11 +1,11 @@
 dat = return "[(\"T\",\"A False | B [2,5,7]\"),(\"U\",\"C True V | D V\"),(\"V\",\"E 9 | F (5, True)\"),(\"W\",\"G V | H | I U\")]"
-gen_value1 = "T" 0 False #{seed} #{dat}
-gen_value2 = "T" 0 False #{seed} #{dat}
-gen_value3 = "U" 1 False #{seed} #{dat}
-gen_value4 = "(U, V)" 2 False #{seed} #{dat}
-gen_value5 = "(V, W)" 2 False #{seed} #{dat}
-gen_value6 = "(W, U)" 2 False #{seed} #{dat}
-gen_value7 = "W" 2 False #{seed} #{dat}
+gen_value1 = "T" 0 0 False #{seed} #{dat}
+gen_value2 = "T" 0 0 False #{seed}1 #{dat}
+gen_value3 = "U" 1 1 False #{seed} #{dat}
+gen_value4 = "(U, V)" 1 2 False #{seed} #{dat}
+gen_value5 = "(V, W)" 1 2 False #{seed} #{dat}
+gen_value6 = "(W, U)" 1 3 False #{seed} #{dat}
+gen_value7 = "W" 1 2 False #{seed} #{dat}
 ----
 {-# LANGUAGE StandaloneDeriving #-}
 module Main where

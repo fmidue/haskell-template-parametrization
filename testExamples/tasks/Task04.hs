@@ -3,8 +3,6 @@ imports = return "import Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQ
 krone = withCurrentSeed (elements ["leaves/crown", "crown/leaves"])
 help:imports = return $ unGen ( elements ["help", "hint"] ) (mkQCGen #{seed}1) 0
 verb {
-module Snippet (verb) where
-
 #{imports}
 
 verb :: IO String

@@ -1,7 +1,5 @@
 seed = return "Wintersemester"
 watermark {
-module Snippet (watermark) where
-
 import Test.QuickCheck.Gen
 import Test.QuickCheck.Random (mkQCGen)
 

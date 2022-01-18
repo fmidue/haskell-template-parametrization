@@ -94,8 +94,8 @@ placeholderDefinition = do
 multilinePlaceholderDefinition :: Parser (String, [Part])
 multilinePlaceholderDefinition = do
     name <- skipMany newline >> manyTill anyChar (char '{')
-    d <- manyTill multilinePart (try $ newline >> char '}')
-    return (filter (/=' ') name, d)
+    code <- manyTill multilinePart (try $ newline >> char '}')
+    return (filter (/=' ') name, Rest ("module Snippet (" ++ name ++ ") where\n"):code)
 
 dataSection :: Parser Section
 dataSection = do
