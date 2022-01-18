@@ -1,6 +1,6 @@
-ungen_zoom = elements [0.4, 0.5, 0.6]
-ungen_x = chooseInt (12,18)
-ungen_y = chooseInt (-4,-8)
+zoom = withCurrentSeed (elements [0.4, 0.5, 0.6])
+x = withCurrentSeed (chooseInt (12,18))
+y = withCurrentSeed (chooseInt (-4,-8))
 -----
 configGhcErrors:
 - deprecation
@@ -219,7 +219,7 @@ main :: IO ()
 main = animationOf sceneWithTime
 
 countTime :: Double -> Picture
-countTime t = dilated #{ungen_zoom} (translated #{ungen_x} (#{ungen_y}) (lettering (pack ("t = " ++ truncatedTime t))))
+countTime t = dilated #{zoom} (translated #{x} (#{y}) (lettering (pack ("t = " ++ truncatedTime t))))
 
 truncatedTime :: Double -> String
 truncatedTime t =

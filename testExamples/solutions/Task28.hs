@@ -1,11 +1,11 @@
-dat = return "[(\"T\",\"A Bool | B [Int]\"),(\"U\",\"C Bool V | D V\"),(\"V\",\"E Int | F (Int, Bool)\"),(\"W\",\"G V | H | I U\")]"
-gen_value1 = "T" 0 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value2 = "T" 0 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value3 = "U" 1 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value4 = "(U, V)" 2 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value5 = "(V, W)" 2 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value6 = "(W, U)" 2 False [1,2,4,6,4,6,4] (M.fromList #{dat})
-gen_value7 = "W" 2 False [1,2,4,6,4,6,4] (M.fromList #{dat})
+dat = return "[(\"T\",\"A False | B [2,5,7]\"),(\"U\",\"C True V | D V\"),(\"V\",\"E 9 | F (5, True)\"),(\"W\",\"G V | H | I U\")]"
+gen_value1 = "T" 0 False #{seed} #{dat}
+gen_value2 = "T" 0 False #{seed} #{dat}
+gen_value3 = "U" 1 False #{seed} #{dat}
+gen_value4 = "(U, V)" 2 False #{seed} #{dat}
+gen_value5 = "(V, W)" 2 False #{seed} #{dat}
+gen_value6 = "(W, U)" 2 False #{seed} #{dat}
+gen_value7 = "W" 2 False #{seed} #{dat}
 ----
 {-# LANGUAGE StandaloneDeriving #-}
 module Main where

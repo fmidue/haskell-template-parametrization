@@ -65,7 +65,7 @@ main :: IO ()
 main = animationOf sceneWithTime
 
 countTime :: Double -> Picture
-countTime t = dilated 0.5 (translated 15 (-6) (lettering (pack ("t = " ++ truncatedTime t))))
+countTime t = dilated #{zoom} (translated #{x} (#{y}) (lettering (pack ("t = " ++ truncatedTime t))))
 
 truncatedTime :: Double -> String
 truncatedTime t =

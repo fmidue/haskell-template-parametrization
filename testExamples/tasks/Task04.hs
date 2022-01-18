@@ -1,6 +1,6 @@
 seed = return "Student A"
 imports = return "import Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)"
-ungen_krone = elements ["leaves/crown", "crown/leaves"]
+krone = withCurrentSeed (elements ["leaves/crown", "crown/leaves"])
 help:imports = return $ unGen ( elements ["help", "hint"] ) (mkQCGen #{seed}1) 0
 verb {
 module Snippet (verb) where
@@ -185,7 +185,7 @@ import Prelude hiding (($))
 import Data.Text (pack)
 
 -- Extend your tree from last week with a short shaking animation you
--- would see when the #{ungen_krone} get hit by some wind. Only the
+-- would see when the #{krone} get hit by some wind. Only the
 -- leaves and branches should move and the motion should stop after a
 -- few seconds (but the program keep running). Make sure that there
 -- are no apparent jumps in your animation.

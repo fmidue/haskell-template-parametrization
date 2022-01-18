@@ -8,8 +8,8 @@ import Prelude hiding (($), (!!))
 -- (x,y) of natural numbers such that all of the following hold:
 --
 --   * x and y are c-digit numbers
---   * y is #{ungen_condition} twice as big as x (#{ungen_conditionGenerator})
---   * the #{ungen_operation} of x and y is also a c-digit number
+--   * y is #{condition} twice as big as x (#{conditionGenerator})
+--   * the #{operation} of x and y is also a c-digit number
 --
 -- A c-digit number is a natural number with exactly c digits.
 -- E.g., the set of 2-digit numbers is {10,...,99}
@@ -23,4 +23,4 @@ c :: Integer
 c = 3
 
 list :: [(Integer,Integer)]
-list = [ (x,y) | x <- [10^(c-1)..10^c-1], y <- [#{ungen_conditionGeneratorL}..10^c-1], (#{ungen_operationGenerator}) < 10^c ]
+list = [ (x,y) | x <- [10^(c-1)..10^c-1], y <- [#{conditionGeneratorL}..10^c-1], (#{operationGenerator}) < 10^c ]

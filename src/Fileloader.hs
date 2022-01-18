@@ -5,7 +5,7 @@ import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.FilePath.Posix ( takeDirectory, takeFileName )
 import Data.List (isSuffixOf)
 import qualified Data.Map as M
-import Default (with, seed, enableWhitespaceWatermarking)
+import Default (with, seed, enableWhitespaceWatermarking, defaultImports, withCurrentSeed, defaultFunctions)
 import Postprocessor (whitespaceWatermarking)
 import Seed (stringToSeed)
 
@@ -17,7 +17,8 @@ loadAllTasks folder = do
     createDirectoryIfMissing True $ takeDirectory "output/solutions/"
     defaults           <- readFile $ folder ++ "/defaults.hs"
     defaultTask        <- parseTask defaults
-    (_, defaultVars)   <- combineToString defaultTask True M.empty
+    defaultTask'       <- with defaultTask M.empty [defaultImports, defaultFunctions, seed, enableWhitespaceWatermarking, withCurrentSeed]
+    (_, defaultVars)   <- combineToString defaultTask' True M.empty
     tasks              <- getDirectoryContents tasksFolder
     solutions          <- getDirectoryContents solutionsFolder
     let allFiles = [(tasksFolder ++ "/" ++ task, solutionsFolder ++ "/" ++ solution) | task <- tasks, solution <- solutions, task == solution, ".hs" `isSuffixOf` task]
@@ -29,7 +30,7 @@ evalTasksAndSolutions _ [] = print "Converted all Files!"
 evalTasksAndSolutions defaults ((x, y):xs) = do 
     tFileContent          <- readFile x
     task                  <- parseTask tFileContent
-    task'                 <- with task defaults [seed, enableWhitespaceWatermarking]
+    task'                 <- with task defaults [defaultImports, defaultFunctions, seed, enableWhitespaceWatermarking, withCurrentSeed]
     (taskOutput, taskMap) <- combineToString task' False defaults
     sFileContent          <- readFile y
     solution              <- parseTask sFileContent
