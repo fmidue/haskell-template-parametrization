@@ -2,7 +2,7 @@
 
 import Test.Hspec (hspec, describe, it, shouldNotSatisfy)
 import System.IO (openTempFile, stderr)
-import System.Random ( newStdGen, Random(randomRs, randomRIO), StdGen )
+import System.Random ( newStdGen, randomRIO, Random(randomRs), StdGen )
 import GHC.IO.Handle ( hFlush, hClose, hPutStr )
 import Control.Monad ( forM, forM_ )
 import Data.Array.IO
@@ -86,7 +86,7 @@ buildContent names = do
 
 separator :: IO StdGen -> IO String
 separator g = do
-        n <- randomRIO (0, 25) :: IO Int
+        n <- randomRIO (0, 25)
         text <- randString g n
         return $ "---" ++ text
 

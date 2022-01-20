@@ -8,7 +8,7 @@ import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
 import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf, skipMany1)
 import Language.Haskell.TH.Syntax (Lift (lift))
 import Text.Parsec.String (Parser)
-import Data.List (find, isPrefixOf, isInfixOf, intersperse, isSuffixOf)
+import Data.List (find, isPrefixOf, isInfixOf, intersperse)
 import Inter (interFile)
 import qualified Data.Map as M
 import Seed (stringToSeed, seedToString)
@@ -95,7 +95,7 @@ multilinePlaceholderDefinition :: Parser (String, [Part])
 multilinePlaceholderDefinition = do
     name <- skipMany newline >> manyTill anyChar (char '{')
     code <- manyTill multilinePart (try $ newline >> char '}')
-    return (filter (/=' ') name, Rest ("module Snippet (" ++ name ++ ") where\n"):code)
+    return (filter (/=' ') name, if "plain_" `isPrefixOf` name then code else Rest ("module Snippet (" ++ name ++ ") where\n"):code)
 
 dataSection :: Parser Section
 dataSection = do
@@ -135,7 +135,7 @@ removeDefaults [] = ["Error."]
 removeDefaults (x:xs) = if x == "{-" then xs else removeDefaults xs
 
 defaultNames :: [String]
-defaultNames = ["seed", "enableWhitespaceWatermarking", "defaultFunctions", "defaultImports", "withCurrentSeed"]
+defaultNames = ["seed", "enableWhitespaceWatermarking", "plain_defaultFunctions", "plain_defaultImports", "plain_withCurrentSeed"]
 
 withAllVars :: Task -> Task
 withAllVars (Task sections) = Task (sections ++ [Code (Rest "\n{-\n" :map Placeholder (concatMap traverseSection sections) ++ [Rest "\n-}\n"])])
@@ -180,7 +180,7 @@ getDataFromTask ph t@(Task (x:xs)) m ma = case x of
     Data d -> case find (\(name, _) -> ph == name) d of
                                   Just (n, y) -> do
                                       (content, m') <- concatIO $ map (comm t m ma) y
-                                      inter <- if "_gen" `isSuffixOf` n then return content else interFile n content
+                                      inter <- if "plain_" `isPrefixOf` n then return content else interFile n content
                                       return (inter, m')
                                   Nothing -> getDataFromTask ph (Task xs) m ma
     Code _ -> getDataFromTask ph (Task xs) m ma
@@ -207,9 +207,10 @@ addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest conte
 
 modifyVarPre :: String -> [Part] -> (String, [Part])
 modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\nimport Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen (") : content ++ [Rest " ) (mkQCGen ", Placeholder "seed", Rest ") 0)"])
-                          | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ (Rest "\n":Placeholder "defaultImports":Rest "\n":Placeholder "defaultFunctions":Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content))
+                          | "plain_" `isPrefixOf` name = (name, content)
+                          | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ (Rest "\n":Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content))
                           | "gen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ D.asString ++ "\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ generate ") : content)
-                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "defaultImports":Rest "\n":Placeholder "defaultFunctions":Rest ("\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
+                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
                           where normalizedName = head sname
                                 sname = splitOn ":" name
 
