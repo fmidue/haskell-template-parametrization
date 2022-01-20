@@ -6,6 +6,9 @@ import Data.Functor ( (<&>) )
 import Task (Task, addSimpleVar, containsVar, addRawVar, Part (Rest, Placeholder))
 import Seed (stringToSeed, seedToString)
 import qualified Data.Map as M
+import Snippet (Snippet(Snippet))
+import qualified DefaultSnippets as S
+import Data.List (union)
 
 seed :: Task -> M.Map String String -> IO Task
 seed task defaults = do
@@ -22,17 +25,17 @@ defaultFunctions task defaults = do
 defaultImports :: Task -> M.Map String String -> IO Task
 defaultImports task defaults = do
     let name = "plain_defaultImports"
-    return $ addToTask name task (addRawVar (name, [Rest "import Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n"])) defaults
+    return $ addToTask name task (addRawVar (name, [Rest (unlines (combineImports [S.withCurrentSeed, S.withSeed]))])) defaults
 
 withCurrentSeed :: Task -> M.Map String String -> IO Task
 withCurrentSeed task defaults = do
     let name = "plain_withCurrentSeed"
-    return $ addToTask name task (addRawVar (name, [Rest "withCurrentSeed :: Show a => Gen a -> IO String\nwithCurrentSeed content = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen ( content ) (mkQCGen ", Placeholder "seed", Rest ") 5)\n"])) defaults
+    return $ addToTask name task (addRawVar (name, let Snippet (_, code) = S.withCurrentSeed in asParts code)) defaults
 
 withSeed :: Task -> M.Map String String -> IO Task
 withSeed task defaults = do
     let name = "plain_withSeed"
-    return $ addToTask name task (addRawVar (name, [Rest "withSeed :: Show a => Gen a -> Int -> IO String\nwithSeed content seed = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen ( content ) (mkQCGen seed) 5)\n"])) defaults
+    return $ addToTask name task (addRawVar (name, let Snippet (_, code) = S.withSeed in asParts code)) defaults
 
 
 enableWhitespaceWatermarking :: Task -> M.Map String String -> IO Task
@@ -42,6 +45,21 @@ enableWhitespaceWatermarking task defaults = do
 
 addToTask :: String -> Task -> (Task -> Task) -> M.Map String String -> Task
 addToTask name task modifyTask defaults = if containsVar name task || name `elem` M.keys defaults then task else modifyTask task
+
+combineImports :: [Snippet] -> [String]
+combineImports [] = []
+combineImports (x:xs) = let Snippet (imports, _) = x in union (combineImports xs) (lines imports)
+
+asParts :: String -> [Part]
+asParts [] = []
+asParts str = let (a, ph, rest) = consume str in if null ph then Rest a : asParts rest else Rest a : Placeholder ph: asParts rest
+
+consume :: String -> (String, String, String)
+consume [] = ("", "", "")
+consume ('#':'{':xs) = ("", placeholder, tail rest)
+    where (placeholder, rest) = break ('}'==) xs
+consume (x:xs) = let (a, p, rest) = consume xs in (x:a, p, rest)
+
 
 with :: Task -> M.Map String String -> [Task -> M.Map String String -> IO Task] -> IO Task
 with task _ [] = return task

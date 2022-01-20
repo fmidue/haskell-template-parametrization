@@ -48,3 +48,4 @@ Test.hs
 Ex.hs
 output/
 old/
+src/DefaultSnippetsTest.hs
