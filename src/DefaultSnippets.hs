@@ -13,15 +13,15 @@ import Test.QuickCheck (chooseInt)
 allowedChars :: [String]
 allowedChars = ["(", ")", ",", "[", "]", " "]
 
-generate :: String -> Int -> Int-> Bool -> Int -> [(String, String)] -> String
-generate str minLength maxLength err seed m =  prettify $ removeEndSpaces (removeEndSpaces (generateData str minLength maxLength 0 err (toDigits seed) (M.fromList m)))
+generateData :: String -> Int -> Int-> Bool -> Int -> [(String, String)] -> String
+generateData str minLength maxLength err seed m =  prettify $ removeEndSpaces (removeEndSpaces (generateData' str minLength maxLength 0 err (toDigits seed) (M.fromList m)))
    where removeEndSpaces x = dropWhile (' '==) (reverse x)
 
-generateData :: String -> Int -> Int -> Int -> Bool -> [Int] -> M.Map String String -> String
-generateData _ _ _ _ _ [] _ = ""
-generateData [] _ _ _ _ _ _ = ""
-generateData str minLength maxLength counter err (z:zs) m | maxLength == 0 || maxLength <= counter = (if null leaf then generateData (gen dat) minLength maxLength (counter + 1) err (zs ++ [z]) m else gen leaf) ++ generateData xs 0 0 counter err (zs ++ [z]) m
-                                                          | otherwise = generateData (if counter < minLength && not (null branch) then gen branch else gen dat) minLength maxLength (counter + 1) err (zs ++ [z]) m ++ generateData xs minLength maxLength counter err (zs ++ [z]) m
+generateData' :: String -> Int -> Int -> Int -> Bool -> [Int] -> M.Map String String -> String
+generateData' _ _ _ _ _ [] _ = ""
+generateData' [] _ _ _ _ _ _ = ""
+generateData' str minLength maxLength counter err (z:zs) m | maxLength == 0 || maxLength <= counter = (if null leaf then generateData' (gen dat) minLength maxLength (counter + 1) err (zs ++ [z]) m else gen leaf) ++ generateData' xs 0 0 counter err (zs ++ [z]) m
+                                                          | otherwise = generateData' (if counter < minLength && not (null branch) then gen branch else gen dat) minLength maxLength (counter + 1) err (zs ++ [z]) m ++ generateData' xs minLength maxLength counter err (zs ++ [z]) m
                                                           where dat = if "|" `isInfixOf` d  && counter /= 0 then map (\c -> if isKey then '(':c ++ ")" else c) spliced else spliced
                                                                 (x, xs) = if any (`isPrefixOf` str) allowedChars then (getPrefix str allowedChars, tail str) else break (\c -> [c] `elem` allowedChars) str
                                                                 spliced = splitOn "|" d

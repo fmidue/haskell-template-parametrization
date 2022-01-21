@@ -1,4 +1,4 @@
-module Default ( seed, enableWhitespaceWatermarking, defaultImports, withCurrentSeed, withSeed, defaultFunctions, with ) where
+module Default ( seed, enableWhitespaceWatermarking, defaultImports, withCurrentSeed, dataBuilder, withSeed, defaultFunctions, with ) where
 
 import Data.Time.Clock ( UTCTime(utctDay), getCurrentTime )
 import Data.Time.Calendar ( toGregorian )
@@ -36,6 +36,11 @@ withSeed :: Task -> M.Map String String -> IO Task
 withSeed task defaults = do
     let name = "plain_withSeed"
     return $ addToTask name task (addRawVar (name, let Snippet (_, code) = S.withSeed in asParts code)) defaults
+
+dataBuilder :: Task -> M.Map String String -> IO Task
+dataBuilder task defaults = do
+    let name = "plain_dataBuilder"
+    return $ addToTask name task (addRawVar (name, let Snippet (imports, code) = S.dataBuilder in Rest imports : asParts code)) defaults
 
 
 enableWhitespaceWatermarking :: Task -> M.Map String String -> IO Task

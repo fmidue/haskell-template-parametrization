@@ -13,21 +13,34 @@ import Task (exercise, Task)
 import Text.Printf (printf)
 import Control.Exception (evaluate)
 import Fileloader (loadAllTasks)
+import TaskTest (testTask)
+import System.Directory (getDirectoryContents)
+import Data.List.Extra (isSuffixOf)
 
 
 main :: IO ()
 main = hspec $ do
-        describe "parse task" $ do
+        describe "parse task" $
                 it "should not throw any exception" $ do
-                        r <- buildRandomTask
-                        parse exercise "" r `shouldNotSatisfy` isParseError
-        describe "parse prebuild task" $ do
+                r <- buildRandomTask
+                parse exercise "" r `shouldNotSatisfy` isParseError
+        describe "parse prebuild task" $
+                it "should not throw any exception" $
+                loadAllTasks "testExamples"
+        describe "test prebuild task" $
                 it "should not throw any exception" $ do
-                        loadAllTasks "testExamples"
+                f <- allFiles
+                mapM_ (uncurry testTask) f
+
+allFiles :: IO [(String, String)]
+allFiles = do
+        tasks              <- getDirectoryContents "output/tasks"
+        solutions          <- getDirectoryContents "output/solutions"
+        return [("output/tasks/" ++ task, "output/solutions/" ++ solution) | task <- tasks, solution <- solutions, task == solution, ".hs" `isSuffixOf` task]
 
 isParseError :: Either a b -> Bool
-isParseError (Left err) = True 
-isParseError _ = False 
+isParseError (Left err) = True
+isParseError _ = False
 
 buildRandomTask :: IO String
 buildRandomTask = do

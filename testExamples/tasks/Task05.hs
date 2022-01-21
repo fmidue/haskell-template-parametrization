@@ -1,8 +1,8 @@
 conditionGenerator = withCurrentSeed (elements ["y >= 2 * x", "y > 2 * x"])
 conditionGeneratorL = withCurrentSeed (elements ["2*x", "2*x+1"])
-operationGenerator = withCurrentSeed (elements ["x + y", "x * y"])
+operationGenerator = withSeed (elements ["x + y", "(x `div` 10) * (y `div` 10)"]) (#{seed} + 1)
 condition = withCurrentSeed (elements ["at least", "more than"])
-operation = withCurrentSeed (elements ["sum", "product"])
+operation = withSeed (elements ["sum of x and y", "product of x/10 and y/10"]) (#{seed} + 1)
 -----
 configGhcErrors:
 - deprecation
@@ -164,7 +164,7 @@ import Prelude hiding (($), (!!))
 --
 --   * x and y are c-digit numbers
 --   * y is #{condition} twice as big as x (#{conditionGenerator})
---   * the #{operation} of x and y is also a c-digit number
+--   * the #{operation} is also a c-digit number
 --
 -- A c-digit number is a natural number with exactly c digits.
 -- E.g., the set of 2-digit numbers is {10,...,99}

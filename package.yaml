@@ -14,6 +14,11 @@ dependencies:
   - time
   - random
   - QuickCheck
+  - hspec
+  - HUnit
+  - haskell-src-exts
+  - syb
+  - deepseq
 default-extensions:
   - TupleSections
   - DuplicateRecordFields
@@ -50,3 +55,8 @@ tests:
       - hspec
       - random
       - array
+      - base
+      - ghc
+      - ghc-paths
+      - ghc-boot-th
+      - directory

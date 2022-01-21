@@ -37,7 +37,7 @@ sol1 {
 #{plain_parser}
 
 sol1 :: IO String
-sol1 = return $ parse "#{gen_value1}" #{seed}
+sol1 = return $ parse "#{value12}" #{seed}
 }
 sol2 {
 #{plain_defaultImports}
@@ -45,7 +45,7 @@ sol2 {
 #{plain_parser}
 
 sol2 :: IO String
-sol2 = return $ parse "#{gen_value2}" #{seed}
+sol2 = return $ parse "#{value12}" #{seed}1
 }
 sol3 {
 #{plain_defaultImports}
@@ -53,7 +53,7 @@ sol3 {
 #{plain_parser}
 
 sol3 :: IO String
-sol3 = return $ parse "#{gen_value3}" #{seed}
+sol3 = return $ parse "#{value345}" #{seed}
 }
 sol4 {
 #{plain_defaultImports}
@@ -61,7 +61,7 @@ sol4 {
 #{plain_parser}
 
 sol4 :: IO String
-sol4 = return $ parse "#{gen_value4}" #{seed}
+sol4 = return $ parse "#{value345}" #{seed}1
 }
 sol5 {
 #{plain_defaultImports}
@@ -69,7 +69,7 @@ sol5 {
 #{plain_parser}
 
 sol5 :: IO String
-sol5 = return $ parse "#{gen_value5}" #{seed}
+sol5 = return $ parse "#{value345}" #{seed}2
 }
 sol6 {
 #{plain_defaultImports}
@@ -77,7 +77,7 @@ sol6 {
 #{plain_parser}
 
 sol6 :: IO String
-sol6 = return $ parse "#{gen_value6}" #{seed}
+sol6 = return $ parse "#{value67}" #{seed}
 }
 sol7 {
 #{plain_defaultImports}
@@ -85,7 +85,7 @@ sol7 {
 #{plain_parser}
 
 sol7 :: IO String
-sol7 = return $ parse "#{gen_value7}" #{seed}
+sol7 = return $ parse "#{value67}" #{seed}1
 }
 -----
 module Main where
@@ -100,25 +100,25 @@ import Data.List (nub)
  - once.
  -}
 
-value1 :: #{gen_value1}
+value1 :: #{value12}
 value1 = #{sol1}
 
-value2 :: #{gen_value2}
+value2 :: #{value12}
 value2 = #{sol2}
 
-value3 :: #{gen_value3}
+value3 :: #{value345}
 value3 = #{sol3}
 
-value4 :: #{gen_value4}
+value4 :: #{value345}
 value4 = #{sol4}
 
-value5 :: #{gen_value5}
+value5 :: #{value345}
 value5 = #{sol5}
 
-value6 :: #{gen_value6}
+value6 :: #{value67}
 value6 = #{sol6}
 
-value7 :: #{gen_value7}
+value7 :: #{value67}
 value7 = #{sol7}
 
 -- A very simple test suite:

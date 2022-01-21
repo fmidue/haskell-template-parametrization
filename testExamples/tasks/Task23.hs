@@ -1,11 +1,8 @@
 dat = return "[(\"A\",\"Maybe A | Either A A | Integer | Bool | [Bool] | [Integer]\")]"
-gen_value1 = "A" 1 1 False #{seed} #{dat}
-gen_value2 = "(A, A)" 1 1 False #{seed}1 #{dat}
-gen_value3 = "((A, A), A)" 1 1 False #{seed}2 #{dat}
-gen_value4 = "A" 2 3 False #{seed}3 #{dat}
-gen_value5 = "(A, A)" 2 3 False #{seed}4 #{dat}
-gen_value6 = "(A, (A, A))" 1 3 False #{seed}5 #{dat}
-gen_value7 = "A" 3 4 False #{seed}6 #{dat}
+value12:plain_dataBuilder = return $ generateData "A" 1 2 False #{seed} #{dat}
+value345:plain_dataBuilder = return $ generateData "(A, A)" 1 2 False #{seed}1 #{dat}
+value67:plain_dataBuilder = return $ generateData "((A, A), A)" 1 2 False #{seed}2 #{dat}
+
 -----
 configGhcErrors:
 - deprecation
@@ -178,25 +175,25 @@ import Data.List (nub)
  - once.
  -}
 
-value1 :: #{gen_value1}
+value1 :: #{value12}
 value1 = undefined
 
-value2 :: #{gen_value2}
+value2 :: #{value12}
 value2 = undefined
 
-value3 :: #{gen_value3}
+value3 :: #{value345}
 value3 = undefined
 
-value4 :: #{gen_value4}
+value4 :: #{value345}
 value4 = undefined
 
-value5 :: #{gen_value5}
+value5 :: #{value345}
 value5 = undefined
 
-value6 :: #{gen_value6}
+value6 :: #{value67}
 value6 = undefined
 
-value7 :: #{gen_value7}
+value7 :: #{value67}
 value7 = undefined
 
 -- A very simple test suite:

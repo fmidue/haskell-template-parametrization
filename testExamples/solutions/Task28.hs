@@ -1,11 +1,22 @@
 dat = return "[(\"T\",\"A False | B [2,5,7]\"),(\"U\",\"C True V | D V\"),(\"V\",\"E 9 | F (5, True)\"),(\"W\",\"G V | H | I U\")]"
-gen_value1 = "T" 0 0 False #{seed} #{dat}
-gen_value2 = "T" 0 0 False #{seed}1 #{dat}
-gen_value3 = "U" 1 1 False #{seed} #{dat}
-gen_value4 = "(U, V)" 1 2 False #{seed} #{dat}
-gen_value5 = "(V, W)" 1 2 False #{seed} #{dat}
-gen_value6 = "(W, U)" 1 3 False #{seed} #{dat}
-gen_value7 = "W" 1 2 False #{seed} #{dat}
+value1:plain_dataBuilder = return $ generateData "T" 0 0 False #{seed} #{dat}
+value2 {
+
+#{plain_dataBuilder}
+
+value2 :: IO String
+value2 = return $ snd (getDifferentData "#{value1}" #{seed})
+
+getDifferentData :: String -> Int -> (Int, String)
+getDifferentData str seed = let (a, b) = getDifferentData str (seed + 1) in if str == dat then getDifferentData str (seed + 1) else (seed, dat)
+    where dat = generateData "T" 0 0 False seed #{dat}
+
+}
+value3:plain_dataBuilder = return $ generateData "U" 1 1 False #{seed} #{dat}
+value4:plain_dataBuilder = return $ generateData "(U, V)" 1 2 False #{seed} #{dat}
+value5:plain_dataBuilder = return $ generateData "(V, W)" 1 2 False #{seed} #{dat}
+value6:plain_dataBuilder = return $ generateData "(W, U)" 1 3 False #{seed} #{dat}
+value7:plain_dataBuilder = return $ generateData "W" 1 2 False #{seed} #{dat}
 ----
 {-# LANGUAGE StandaloneDeriving #-}
 module Main where
@@ -22,25 +33,25 @@ data W = #{w}
 -- once. Also, do not reuse any subexpressions.
 
 value1 :: T
-value1 = #{gen_value1}
+value1 = #{value1}
 
 value2 :: T
-value2 = #{gen_value2}
+value2 = #{value2}
 
 value3 :: U
-value3 = #{gen_value3}
+value3 = #{value3}
 
 value4 :: (U, V)
-value4 = #{gen_value4}
+value4 = #{value4}
 
 value5 :: (V, W)
-value5 = #{gen_value5}
+value5 = #{value5}
 
 value6 :: (W, U)
-value6 = #{gen_value6}
+value6 = #{value6}
 
 value7 :: W
-value7 = #{gen_value7}
+value7 = #{value7}
 
 -- A very simple test suite:
 main :: IO ()

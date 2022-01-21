@@ -9,7 +9,7 @@ import Prelude hiding (($), (!!))
 --
 --   * x and y are c-digit numbers
 --   * y is #{condition} twice as big as x (#{conditionGenerator})
---   * the #{operation} of x and y is also a c-digit number
+--   * the #{operation} is also a c-digit number
 --
 -- A c-digit number is a natural number with exactly c digits.
 -- E.g., the set of 2-digit numbers is {10,...,99}
