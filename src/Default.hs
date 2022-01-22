@@ -42,7 +42,6 @@ dataBuilder task defaults = do
     let name = "plain_dataBuilder"
     return $ addToTask name task (addRawVar (name, let Snippet (imports, code) = S.dataBuilder in Rest imports : asParts code)) defaults
 
-
 enableWhitespaceWatermarking :: Task -> M.Map String String -> IO Task
 enableWhitespaceWatermarking task defaults = do
     let name = "enableWhitespaceWatermarking"
@@ -64,7 +63,6 @@ consume [] = ("", "", "")
 consume ('#':'{':xs) = ("", placeholder, tail rest)
     where (placeholder, rest) = break ('}'==) xs
 consume (x:xs) = let (a, p, rest) = consume xs in (x:a, p, rest)
-
 
 with :: Task -> M.Map String String -> [Task -> M.Map String String -> IO Task] -> IO Task
 with task _ [] = return task

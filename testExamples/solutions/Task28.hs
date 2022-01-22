@@ -1,22 +1,86 @@
 dat = return "[(\"T\",\"A False | B [2,5,7]\"),(\"U\",\"C True V | D V\"),(\"V\",\"E 9 | F (5, True)\"),(\"W\",\"G V | H | I U\")]"
+plain_data {
+data T = #{t} deriving (Show, Read, Eq)
+data U = #{u} deriving (Show, Read, Eq)
+data V = #{v} deriving (Show, Read, Eq)
+data W = #{w} deriving (Show, Read, Eq)
+}
 value1:plain_dataBuilder = return $ generateData "T" 0 0 False #{seed} #{dat}
 value2 {
 
 #{plain_dataBuilder}
 
 value2 :: IO String
-value2 = return $ snd (getDifferentData "#{value1}" #{seed})
+value2 = return $ getDifferentData #{seed}
 
-getDifferentData :: String -> Int -> (Int, String)
-getDifferentData str seed = let (a, b) = getDifferentData str (seed + 1) in if str == dat then getDifferentData str (seed + 1) else (seed, dat)
+getDifferentData :: Int -> String
+getDifferentData seed = if "#{value1}" == dat then getDifferentData (seed + 1) else dat
     where dat = generateData "T" 0 0 False seed #{dat}
 
 }
 value3:plain_dataBuilder = return $ generateData "U" 1 1 False #{seed} #{dat}
-value4:plain_dataBuilder = return $ generateData "(U, V)" 1 2 False #{seed} #{dat}
-value5:plain_dataBuilder = return $ generateData "(V, W)" 1 2 False #{seed} #{dat}
-value6:plain_dataBuilder = return $ generateData "(W, U)" 1 3 False #{seed} #{dat}
-value7:plain_dataBuilder = return $ generateData "W" 1 2 False #{seed} #{dat}
+value4 {
+
+#{plain_dataBuilder}
+
+#{plain_data}
+
+value4 :: IO String
+value4 = return $ getDifferentData #{seed}
+
+getDifferentData :: Int -> String
+getDifferentData seed = if head "#{value3}" == head (show k) then getDifferentData (seed + 1) else show (k, j)
+    where (k, j) = read (generateData "(U, V)" 0 1 False seed #{dat}) :: (U, V)
+
+}
+value5 {
+
+#{plain_dataBuilder}
+
+#{plain_data}
+
+value5 :: IO String
+value5 = return $ getDifferentData #{seed}
+
+getDifferentData :: Int -> String
+getDifferentData seed = if head (show value4) == head (show k) then getDifferentData (seed + 1) else show (k, j)
+    where (k, j) = read (generateData "(V, W)" 0 2 False seed #{dat}) :: (V, W)
+          value4 = snd (#{value4})
+
+}
+value6 {
+
+#{plain_dataBuilder}
+
+#{plain_data}
+
+value6 :: IO String
+value6 = return $ getDifferentData #{seed}
+
+getDifferentData :: Int -> String
+getDifferentData seed = if head (show value5) == head (show k) || show value3 == show j || show value4 == show j then getDifferentData (seed + 1) else show (k, j)
+    where (k, j) = read (generateData "(W, U)" 0 2 False seed #{dat}) :: (W, U)
+          value5 = snd (#{value5})
+          value3 = #{value3}
+          value4 = fst (#{value4})
+
+}
+value7 {
+
+#{plain_dataBuilder}
+
+#{plain_data}
+
+value7 :: IO String
+value7 = return $ getDifferentData #{seed}
+
+getDifferentData :: Int -> String
+getDifferentData seed = if head (show value5) == head (show k)  || head (show value6) == head (show k) then getDifferentData (seed + 1) else show k
+    where k = read (generateData "W" 0 2 False seed #{dat}) :: W
+          value5 = snd (#{value5})
+          value6 = fst (#{value6})
+
+}
 ----
 {-# LANGUAGE StandaloneDeriving #-}
 module Main where
