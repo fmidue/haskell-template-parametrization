@@ -38,8 +38,8 @@ excludedTasks = ["Task01.hs", "Task03.hs", "Task04.hs", "TaskErr01.hs", "TaskErr
 
 allFiles :: IO [(String, String)]
 allFiles = do
-        tasks              <- getDirectoryContents "output/tasks"
-        solutions          <- getDirectoryContents "output/solutions"
+        tasks              <- getDirectoryContents "testExamples/tasks"
+        solutions          <- getDirectoryContents "testExamples/solutions"
         return [("output/tasks/" ++ task, "output/solutions/" ++ solution) | task <- tasks, solution <- solutions, task == solution, ".hs" `isSuffixOf` task, task `notElem` excludedTasks]
 
 isParseError :: Either a b -> Bool
