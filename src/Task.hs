@@ -59,7 +59,7 @@ placeholder = string "#{" *> fmap Placeholder (manyTill anyChar (char '}'))
 
 rest :: Parser Part
 rest = fmap Rest (try (manyTill anyChar (try $ lookAhead (string "#{")))
-                    <|> try (manyTill anyChar (lookAhead seperator))
+                    <|> try (manyTill anyChar (lookAhead separator))
                     <|> many1 anyChar)
 
 singlelineRest :: Parser Part
@@ -79,7 +79,7 @@ multilinePart = try placeholder <|> multilineRest
 
 codeSection :: Parser Section
 codeSection = do
-    txt <- try (manyTill part seperator) <|> many1 part
+    txt <- try (manyTill part separator) <|> many1 part
     return $ Code txt
 
 placeholderDefinitions :: Parser (String, [Part])
@@ -100,7 +100,7 @@ multilinePlaceholderDefinition = do
 
 dataSection :: Parser Section
 dataSection = do
-    d <- manyTill (placeholderDefinitions <* skipMany (string "\r")) (try seperator)
+    d <- manyTill (placeholderDefinitions <* skipMany (string "\r")) (try separator)
     return $ Data d
 
 defaultSection :: Parser Section
@@ -108,8 +108,8 @@ defaultSection = do
     d <- many (placeholderDefinitions <* skipMany (string "\r"))
     return $ Data d
 
-seperator :: Parser String
-seperator = skipMany1 newline >> string "---" >> manyTill anyChar newline
+separator :: Parser String
+separator = skipMany1 newline >> string "---" >> manyTill anyChar newline
 
 exercise :: Parser Task
 exercise = do
@@ -211,7 +211,7 @@ modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Sn
                           | "plain_" `isPrefixOf` name = (name, content)
                           | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : Rest "\n":Placeholder "plain_defaultImports" : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content)
                           | "gen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ imports ++ code ++ "\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ generateData ") : content)
-                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
+                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: Show a => IO a\n" ++ name ++ " ="):content)
                           where normalizedName = head sname
                                 sname = splitOn ":" name
                                 Snippet (imports, code) = D.dataBuilder

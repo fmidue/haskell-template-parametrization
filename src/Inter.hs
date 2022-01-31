@@ -34,7 +34,7 @@ interFile name code = do
     join $ finally (inter name tmp) (removeFile tmp)
 
 
-inter :: String -> FilePath -> IO (IO String)
+inter :: Show a => String -> FilePath -> IO (IO a)
 inter name file = defaultErrorHandler defaultFatalMessager defaultFlushOut $ do
     runGhc (Just libdir) $ do
         dflags <- getSessionDynFlags
