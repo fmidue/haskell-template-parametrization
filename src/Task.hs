@@ -211,7 +211,7 @@ modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Sn
                           | "plain_" `isPrefixOf` name = (name, content)
                           | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : Rest "\n":Placeholder "plain_defaultImports" : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content)
                           | "gen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ imports ++ code ++ "\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ generateData ") : content)
-                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: Show a => IO a\n" ++ name ++ " ="):content)
+                          | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
                           where normalizedName = head sname
                                 sname = splitOn ":" name
                                 Snippet (imports, code) = D.dataBuilder
