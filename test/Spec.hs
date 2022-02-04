@@ -30,11 +30,11 @@ main = do
                         it "should not throw any exception" $
                         loadAllTasks "testExamples"
                 describe "test prebuild task" $ do
-                        mapM_ (\x -> (it (last (splitOn "/"(fst x)) ++ " should not throw any exception") ((uncurry testTask) x))) f
+                        mapM_ (\x -> it (last (splitOn "/"(fst x)) ++ " should not throw any exception") (uncurry testTask x)) f
 
 -- Excluding CodeWorld tasks until the issue, to include CodeWorld, is fixed.
 excludedTasks :: [String]
-excludedTasks = ["Task01.hs", "Task03.hs", "Task04.hs", "TaskErr01.hs", "TaskErr02.hs"]
+excludedTasks = ["Task01.hs", "Task03.hs", "Task04.hs", "TaskErr02.hs"]
 
 allFiles :: IO [(String, String)]
 allFiles = do

@@ -33,10 +33,10 @@ import Outputable ()
 import Pretty ()
 import OccName ( HasOccName(occName), mkOccName, varName )
 
-import Data.List (find)
+import Data.List (find, isInfixOf)
 
 import Control.Exception (finally)
-import Control.Monad (join, when)
+import Control.Monad (join, when, unless)
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 
 import System.Exit (exitFailure)
@@ -53,7 +53,7 @@ import Unsafe.Coerce (unsafeCoerce)
 
 testTask :: FilePath -> FilePath -> IO ()
 testTask task solution = do
-    putStrLn $ "\ESC[34mTesing file " ++ task ++ "\ESC[0m"
+    putStrLn $ "\ESC[34mTesting file " ++ task ++ "\ESC[0m"
     runMain task solution Nothing
 
 runMain :: FilePath -> FilePath -> Maybe [String] -> IO ()
@@ -69,8 +69,9 @@ runMain task solution typeHoles = do
     env <- setupEnv envFile
     -- test compile template
     -- don't load the first (primary) test module but load other hidden modules so that the template can import them
-    (sflagTemplate,_) <- compileFiles env $ template : tail tests
-    reportOutcome "template" sflagTemplate
+    unless ("Err" `isInfixOf` task) $ do
+      (sflagTemplate,_) <- compileFiles env $ template : tail tests
+      reportOutcome "template" sflagTemplate
     -- test compile solution and tests
     (sflagSolution,env) <- compileFiles env $ [configDir ++ "/TestHelper", configDir ++ "/TestHarness", solution] ++ tests
     reportOutcome "solution and tests" sflagSolution

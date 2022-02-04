@@ -3,7 +3,7 @@ bug1 = return $ ["let line = getLine'", "line <- getLine'"]!!(#{rdmSelection}!!0
 bug2 = return $ ["", "num' <- "]!!(#{rdmSelection}!!1)
 bug3 = return $ ["num", "num'"]!!(#{rdmSelection}!!1)
 bug4 = return $ ["line", "(read line :: Int)"]!!(#{rdmSelection}!!2)
-bug5 = return $ ["num", "(show num)"]!!(#{rdmSelection}!!3)
+bug5 = return $ ["num", "show num"]!!(#{rdmSelection}!!3)
 bug6 = return $ ["", "   "]!!(#{rdmSelection}!!4)
 bug7 = return $ ["(c ++ l)", "(c:l)"]!!(#{rdmSelection}!!5)
 bug8 = return $ ["x:xs", "(x:xs)"]!!(#{rdmSelection}!!6)
@@ -17,7 +17,7 @@ import Control.Monad
 addInput :: Int -> IO ()
 addInput num = do
   #{bug1}
-  if (line /= "end") then do
+  if line /= "end" then do
     #{bug2}if isNum line 
               then return (num + #{bug4}) 
               else do putStrLn "Input is not a number!"

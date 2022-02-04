@@ -1,23 +1,14 @@
-rdmSelection = withCurrentSeed (shuffle [1,0,1,0,1])
-bug1 = return $ ["string", "String"]!!(#{rdmSelection}!!0)
-bug2 = return $ ["Reverse", "reverse"]!!(#{rdmSelection}!!1)
-bug3 = return $ ["let", "where"]!!(#{rdmSelection}!!2)
-bug4 = return $ ["isPalindrom", "isPalindrome"]!!(#{rdmSelection}!!3)
-bug5 = return $ ["low", "list"]!!(#{rdmSelection}!!4)
---------------------
+condition = withCurrentSeed (elements ["(x `mod` 11) == 0", "x < 20", "x < 10", "x > 2"])
+operation = withSeed (elements ["5 * x - 3 +", "23 - x +", "x + 10 -"]) (#{seed} + 1)
+----------
 configGhcErrors:
 - deprecation
 - empty-enumerations
 - identities
-# - incomplete-patterns # might reveal list patterns
-# - incomplete-uni-patterns # might reveal list patterns
-- missing-signatures
 - name-shadowing
 - overflowed-literals
 - overlapping-patterns
 - tabs
-- unused-matches
-- unused-pattern-binds
 configHlintErrors:
 - Avoid reverse
 - Collapse lambdas
@@ -62,18 +53,12 @@ configHlintErrors:
 - Use id
 - Use if
 - Use init
-# - Use isJust
-# - Use isNothing
 - Use last
 - Use left fold instead of right fold
 - Use list literal pattern
-- Use maximum
-- Use minimum
-# - Use null
 - Use odd
 - Use otherwise
 - Use product
-- Use replicate
 - Use right fold instead of left fold
 - Use snd
 - Use sum
@@ -93,7 +78,7 @@ configHlintErrors:
 - Using or on tuple
 - Using product on tuple
 - Using sum on tuple
-allowAdding: true
+allowAdding: false
 allowModifying: false
 allowRemoving: false
 configHlintGroups:
@@ -101,7 +86,12 @@ configHlintGroups:
 - teaching
 # QuickCheck/HUnit testing follows the template check
 configGhcWarnings:
+- incomplete-patterns
+- incomplete-uni-patterns
+- missing-signatures
 - unused-local-binds
+- unused-matches
+- unused-pattern-binds
 configHlintRules:
 - 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
 - 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
@@ -123,6 +113,7 @@ configHlintSuggestions:
 - Too strict maybe
 - Use ++
 - Use 1
+- "Use :"
 - Use all
 - Use and
 - Use any
@@ -134,19 +125,26 @@ configHlintSuggestions:
 - Use find
 - Use floor
 - Use foldl
-- Use foldr
+# - Use foldr # might otherwise reveal the solution?
 - Use fromMaybe
 - Use infix
+# - Use isJust
+# - Use isNothing
 - Use lefts
 - Use list comprehension
+- Use map
 - Use map once
 - Use mapMaybe
+- Use maximum
 # - Use maybe
+- Use minimum
 - Use negate
 - Use newtype instead of data
 - Use notElem
+# - Use null
 - Use or
 - Use repeat
+- Use replicate
 - Use rights
 - Use section
 - Use splitAt
@@ -164,58 +162,43 @@ configLanguageExtensions:
 # configGhcErrors          - GHC warnings to enforce
 ----------
 module Main where
-import Data.Char (toUpper, toLower)
 import Test.QuickCheck
 
-isPalindrome :: #{bug1} -> Bool
-isPalindrome list = #{bug5} == #{bug2} low
-  #{bug3} low = [ toLower c | c <- list ]
+{- Here is a recursive function on lists of integers. It is not really
+ - important what it does and why, but it obviously does it by
+ - structural recursion:
+ -}
 
+original :: [Integer] -> Integer
+original [] = 7
+original (x:xs) | #{condition} = #{operation} original xs
+                | otherwise         = x * original xs
+
+{- The 'foldr' function shown in the lecture was said to exactly
+ - capture structural recursion on lists. So it should be possible to
+ - express the above function as an application of 'foldr'. That is
+ - your task. Replace the two occurrences of 'undefined' in the
+ - following definition, such that 'original' and 'alternative'
+ - compute the same mathematical function.
+ -
+ - Do not use any additional top-level or local (let, where)
+ - definitions.
+ -}
+
+alternative :: [Integer] -> Integer
+alternative = foldr undefined undefined
+
+-- The obvious test suite:
 main :: IO ()
-main = do putStrLn "A single character is a palindrome:"
-          quickCheck (\c -> isPalindrome [c])
-          putStrLn "Adding the same character to the front and back of a string does not change the outcome of isPalindrome:"
-          quickCheck (\c str -> isPalindrome ([toUpper c] ++ str ++ [c]) == #{bug4} str) 
-                
---------------------
+main = quickCheck $ \list -> original list == alternative list
+----------
 module Test (test) where
 import qualified Main
-import Test.QuickCheck
-import TestHelper (qcWithTimeout)
-import Test.HUnit ((~:), (@=?), Test)
-import Data.Char
+import TestHelper (qcWithTimeoutAndRuns)
+import Test.HUnit ((~:), Test)
 
-test :: [[ Test ]]
+test :: [ Test ]
 test =
-  [[ " Testing 'Aibohphobia'"
-    ~: True @=? Main.isPalindrome "Aibohphobia",
-    " Testing 'Zerimar Ramirez'"
-    ~: True @=? Main.isPalindrome "Zerimar Ramirez",
-    " Testing 'racecar'"
-    ~: True @=? Main.isPalindrome "racecar",
-    " Testing 'bus'"
-    ~: False @=? Main.isPalindrome "bus",
-    " Testing 'top spot' (spaces are relevant!)"
-    ~: False @=? Main.isPalindrome "top spot",
-    " Testing with actual palindromes (result should be True):"
-    ~: qcWithTimeout 5000 $ forAll validInputs $ \list -> Main.isPalindrome list,
-    " Testing with non-palindromes (result should be False):"
-    ~: qcWithTimeout 5000 $ forAll invalidInputs $ \list -> not (Main.isPalindrome list)
-  ]]
-
-validInputs :: Gen String
-validInputs = do s <- listOf (elements "123abc")
-                 b <- arbitrary
-                 let p = (if b || null s
-                          then s ++ reverse s
-                          else s ++ tail (reverse s))
-                 toUp <- vectorOf (length p) arbitrary
-                 return (zipWith (\f c -> if f then toUpper c else c) toUp p)
-
-invalidInputs :: Gen String
-invalidInputs = do n <- growingElements [2..100]
-                   s <- vectorOf n (elements "ABC123abc")
-                   let s' = map toUpper s
-                   if s' == reverse s'
-                     then invalidInputs
-                     else return s
+  [ " Test with random inputs"
+    ~: qcWithTimeoutAndRuns 5000 100 $ \list -> Main.alternative list == Main.original list
+  ]
