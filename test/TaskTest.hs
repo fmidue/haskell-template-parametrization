@@ -26,7 +26,7 @@ import GHC
       setContext,
       mkModuleName,
       LoadHowMuch(LoadAllTargets),
-      InteractiveImport(IIDecl) )
+      InteractiveImport(IIDecl), succeeded )
 import GHC.LanguageExtensions.Type ()
 import DynFlags ( defaultFatalMessager, defaultFlushOut )
 import Outputable ()
@@ -69,9 +69,11 @@ runMain task solution typeHoles = do
     env <- setupEnv envFile
     -- test compile template
     -- don't load the first (primary) test module but load other hidden modules so that the template can import them
-    unless ("Err" `isInfixOf` task) $ do
-      (sflagTemplate,_) <- compileFiles env $ template : tail tests
-      reportOutcome "template" sflagTemplate
+    (sflagTemplate,_) <- compileFiles env $ template : tail tests
+
+    if "Err" `isInfixOf` task then reportErrOutcome "template" sflagTemplate
+      else reportOutcome "template" sflagTemplate
+
     -- test compile solution and tests
     (sflagSolution,env) <- compileFiles env $ [configDir ++ "/TestHelper", configDir ++ "/TestHarness", solution] ++ tests
     reportOutcome "solution and tests" sflagSolution
@@ -90,6 +92,13 @@ reportOutcome target Failed = do
   putStrLn "Error locations are relative to configuration boundaries"
   putStrLn $ target ++ " compilation failed"
   exitFailure
+
+reportErrOutcome :: String -> SuccessFlag -> IO ()
+reportErrOutcome target Succeeded = do
+  putStrLn $ target ++ " complilation successfull. Should have failed!"
+  exitFailure
+reportErrOutcome target Failed =
+  putStrLn $ target ++ " compilation failed. Success!"
 
 setupEnv :: Maybe FilePath -> IO HscEnv
 setupEnv env = defaultErrorHandler defaultFatalMessager defaultFlushOut $

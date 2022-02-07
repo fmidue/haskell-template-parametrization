@@ -1,6 +1,8 @@
 name = withCurrentSeed (elements ["sum", "product"])
 operator = withCurrentSeed (elements ["+", "*"])
 neutralElement = withCurrentSeed (elements ["0", "1"])
+plain_exampleList = [2, 5, 3]
+result = return $ show (#{name} #{plain_exampleList})
 ---------
 configGhcErrors:
 - deprecation
@@ -165,9 +167,10 @@ import Prelude hiding (($), (!!), tail, take, drop, foldr, foldl, #{name})
 import Test.QuickCheck
 
 {-
- - Write a function '#{name}' which computes the #{name} of a (finite)
- - list of numbers, so that for example: #{name} [2,5,3] == 2 #{operator} 5 #{operator} 3.
+ - Write a function '#{name}' which computes the #{name} (x#{operator}y) of a (finite)
+ - list of numbers, so that for example: #{name} #{plain_exampleList} == #{result}.
  -
+ - 
  - You should not use pattern-matching on binary list constructors
  - here, even if you happen to already know this concept. Instead, use
  - a divide-and-conquer approach. That is, we expect to see something

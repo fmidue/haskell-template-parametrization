@@ -1,6 +1,9 @@
 module Main where
 import Control.Monad
 
+main :: IO ()
+main = addInput 0
+
 addInput :: Int -> IO ()
 addInput num = do
   line <- getLine'

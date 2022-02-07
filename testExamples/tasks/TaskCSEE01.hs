@@ -1,16 +1,6 @@
-rdmSelection = withCurrentSeed (shuffle [1,0,1,0,1,0,1,0,1])
-bug1 = return $ ["let line = getLine'", "line <- getLine'"]!!(#{rdmSelection}!!0)
-bug2 = return $ ["", "num' <- "]!!(#{rdmSelection}!!1)
-bug3 = return $ ["num", "num'"]!!(#{rdmSelection}!!1)
-bug4 = return $ ["line", "(read line :: Int)"]!!(#{rdmSelection}!!2)
-bug5 = return $ ["num", "show num"]!!(#{rdmSelection}!!3)
-bug6 = return $ ["", "   "]!!(#{rdmSelection}!!4)
-bug7 = return $ ["(c ++ l)", "(c:l)"]!!(#{rdmSelection}!!5)
-bug8 = return $ ["x:xs", "(x:xs)"]!!(#{rdmSelection}!!6)
-bug9 = return $ ["", "\nisNum [] = True"]!!(#{rdmSelection}!!7)
-bug9 = if #{rdmSelection}!!7 == 1 then return "\nisNum [] = True" else withCurrentSeed (elements ["", "\nisNum [] = False"])
-bug10 = if #{rdmSelection}!!8 == 1 then return "&& isNum xs" else withSeed (elements ["", "|| isNum xs"]) (#{seed} + 1)
--------
+rev1 = withCurrentSeed (elements ["", "reverse "])
+rev2 = withCurrentSeed (elements ["reverse ", ""])
+--------------------
 configGhcErrors:
 - deprecation
 - empty-enumerations
@@ -168,32 +158,59 @@ configLanguageExtensions:
 # configHlintErrors        - hlint hints to enforce
 # configGhcWarnings        - GHC warnings to provide as hints
 # configGhcErrors          - GHC warnings to enforce
--------
+----------
 module Main where
-import Control.Monad
+import Data.Char (toUpper, toLower)
+import Test.QuickCheck
+
+isPalindrome :: String -> Bool
+isPalindrome list = #{rev1}[ toLower c | c <- list ] == #{rev2}[ toLower c | c <- list ]
 
 main :: IO ()
-main = addInput 0
+main = do putStrLn "A single character is a palindrome:"
+          quickCheck (\c -> isPalindrome [c])
+          putStrLn "Adding the same character to the front and back of a string does not change the outcome of isPalindrome:"
+          quickCheck (\c str -> isPalindrome ([toUpper c] ++ str ++ [c]) == isPalindrome str)
+                
+--------------------
+module Test (test) where
+import qualified Main
+import Test.QuickCheck
+import TestHelper (qcWithTimeout)
+import Test.HUnit ((~:), (@=?), Test)
+import Data.Char
 
-addInput :: Int -> IO ()
-addInput num = do
-  #{bug1}
-  if line /= "end" then do
-    #{bug2}if isNum line 
-              then return (num + #{bug4}) 
-              else do putStrLn "Input is not a number!"
-                      return num
-    addInput #{bug3}
-  else putStrLn $ "Result: " ++ #{bug5}
+test :: [[ Test ]]
+test =
+  [[ " Testing 'Aibohphobia'"
+    ~: True @=? Main.isPalindrome "Aibohphobia",
+    " Testing 'Zerimar Ramirez'"
+    ~: True @=? Main.isPalindrome "Zerimar Ramirez",
+    " Testing 'racecar'"
+    ~: True @=? Main.isPalindrome "racecar",
+    " Testing 'bus'"
+    ~: False @=? Main.isPalindrome "bus",
+    " Testing 'top spot' (spaces are relevant!)"
+    ~: False @=? Main.isPalindrome "top spot",
+    " Testing with actual palindromes (result should be True):"
+    ~: qcWithTimeout 10000 $ forAll validInputs $ \list -> Main.isPalindrome list,
+    " Testing with non-palindromes (result should be False):"
+    ~: qcWithTimeout 10000 $ forAll invalidInputs $ \list -> not (Main.isPalindrome list)
+  ]]
 
-getLine' :: IO String
-getLine' = do c <- getChar
-           #{bug6}if c == '\n'
-                  then return ""
-                  else do l <- getLine'
-                          return #{bug7}
+validInputs :: Gen String
+validInputs = do s <- listOf (elements "123abc")
+                 b <- arbitrary
+                 let p = (if b || null s
+                          then s ++ reverse s
+                          else s ++ tail (reverse s))
+                 toUp <- vectorOf (length p) arbitrary
+                 return (zipWith (\f c -> if f then toUpper c else c) toUp p)
 
-isNum :: String -> Bool#{bug9}
-isNum #{bug8} = elem x "1234567890" #{bug10}
-
--- Correct the Tasks above!
+invalidInputs :: Gen String
+invalidInputs = do n <- growingElements [2..100]
+                   s <- vectorOf n (elements "ABC123abc")
+                   let s' = map toUpper s
+                   if s' == reverse s'
+                     then invalidInputs
+                     else return s
