@@ -2,3 +2,11 @@ resolver: lts-18.22
 packages:
   - .
 extra-deps:
+  - git: https://github.com/fmidue/IOTasks.git
+    commit: cd3fd97976de6368343db1806a296fcae4ff816f
+    subdirs: 
+    - transparent-terms
+    - dynamic-environment
+    - IOTasks
+  - holmes-0.3.2.0@sha256:3d4aeb74177bafedc55a9c21be682ad45929490d1d809dec7fe248a503df0290,4597
+  - pretty-tree-0.1.0.0@sha256:49b0e17008f9d30328db2bcc2958f3a7b78d154d2335c2dbaa2073e237b524ae,668

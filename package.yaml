@@ -19,6 +19,9 @@ dependencies:
   - haskell-src-exts
   - syb
   - deepseq
+  - IOTasks
+  - dynamic-environment
+  - transparent-terms
 default-extensions:
   - TupleSections
   - DuplicateRecordFields

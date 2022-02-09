@@ -1,33 +1,24 @@
-rdmSelection = withCurrentSeed (shuffle [1,0,1,0,1,0,1,0,1])
-bug1 = return $ ["let line = getLine'", "line <- getLine'"]!!(#{rdmSelection}!!0)
-bug2 = return $ ["", "num' <- "]!!(#{rdmSelection}!!1)
-bug3 = return $ ["num", "num'"]!!(#{rdmSelection}!!1)
-bug4 = return $ ["line", "(read line :: Int)"]!!(#{rdmSelection}!!2)
-bug5 = return $ ["num", "show num"]!!(#{rdmSelection}!!3)
-bug6 = return $ ["", "   "]!!(#{rdmSelection}!!4)
-bug7 = return $ ["(c ++ l)", "(c:l)"]!!(#{rdmSelection}!!5)
-bug8 = return $ ["x:xs", "(x:xs)"]!!(#{rdmSelection}!!6)
-bug9 = return $ ["", "\nisNum [] = True"]!!(#{rdmSelection}!!7)
-bug9 = if #{rdmSelection}!!7 == 1 then return "\nisNum [] = True" else withCurrentSeed (elements ["", "\nisNum [] = False"])
-bug10 = if #{rdmSelection}!!8 == 1 then return "&& isNum xs" else withSeed (elements ["", "|| isNum xs"]) (#{seed} + 1)
--------
+rdmSelection = withCurrentSeed (shuffle [1,0,1,0,1,0,1,0])
+bug1 = return $ [">", "<"]!!(#{rdmSelection}!!0)
+bug2 = return $ ["", "show "]!!(#{rdmSelection}!!1)
+bug3 = return $ ["(#{bug2}(i-1) ++ \" summands were\")", "#{bug2}(i-1) ++ \" summands were\""]!!(#{rdmSelection}!!2)
+bug4 = return $ ["", "show "]!!(#{rdmSelection}!!3)
+bug5 = return $ ["", "show "]!!(#{rdmSelection}!!4)
+bug6 = return $ ["0", "1"]!!(#{rdmSelection}!!5)
+bug7 = return $ ["i+1 s+z", "(i+1) (s+z)"]!!(#{rdmSelection}!!6)
+bug8 = return $ ["x:xs", "(x:xs)"]!!(#{rdmSelection}!!7)
+--------
 configGhcErrors:
 - deprecation
 - empty-enumerations
 - identities
-# - incomplete-patterns # might reveal list patterns
-# - incomplete-uni-patterns # might reveal list patterns
-- missing-signatures
 - name-shadowing
 - overflowed-literals
 - overlapping-patterns
 - tabs
-- unused-matches
-- unused-pattern-binds
 configHlintErrors:
 - Avoid reverse
 - Collapse lambdas
-- Eta reduce
 - Evaluate
 - Length always non-negative
 - Move brackets to avoid $
@@ -48,6 +39,7 @@ configHlintErrors:
 - Redundant negate
 - Redundant not
 - Redundant pair
+- Redundant return
 - Redundant section
 - Use !!
 - Use &&
@@ -68,18 +60,16 @@ configHlintErrors:
 - Use id
 - Use if
 - Use init
-# - Use isJust
-# - Use isNothing
 - Use last
 - Use left fold instead of right fold
+- Use let
 - Use list literal pattern
-- Use maximum
-- Use minimum
-# - Use null
 - Use odd
 - Use otherwise
+- Use print
 - Use product
-- Use replicate
+- Use putStr
+- Use putStrLn
 - Use right fold instead of left fold
 - Use snd
 - Use sum
@@ -107,15 +97,31 @@ configHlintGroups:
 - teaching
 # QuickCheck/HUnit testing follows the template check
 configGhcWarnings:
+- incomplete-patterns
+- incomplete-uni-patterns
+- missing-signatures
 - unused-local-binds
+- unused-matches
+- unused-pattern-binds
+- unused-do-bind
+- wrong-do-bind
 configHlintRules:
 - 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
 - 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
+- 'warn: {lhs: Test.IOTasks.IOrep.putStrLn (show x), rhs: Test.IOTasks.IOrep.print x}'
+- 'warn: {lhs: Test.IOTasks.IOrep.putStr (x ++ "\n"), rhs: Test.IOTasks.IOrep.putStrLn x}'
+- 'warn: {lhs: Test.IOTasks.IOrep.putStr (x ++ y ++ "\n"), rhs: Test.IOTasks.IOrep.putStrLn (x ++ y)}'
+- 'warn: {lhs: mapM_ Test.IOTasks.IOrep.putChar, rhs: Test.IOTasks.IOrep.putStr}'
+- 'hint: {lhs: Test.IOTasks.IOrep.print s, rhs: Test.IOTasks.IOrep.putStrLn s, side: isLitString s, name: Consider avoiding print on String}'
+- 'hint: {lhs: Test.IOTasks.IOrep.print (s ++ t), rhs: Test.IOTasks.IOrep.putStrLn (s ++ t), side: isLitString s || isLitString t, name: Consider avoiding print on String}'
+- 'hint: {lhs: Test.IOTasks.IOrep.print (s ++ t ++ u), rhs: Test.IOTasks.IOrep.putStrLn (s ++ t ++ u), side: not (isLitString s) && (isLitString t || isLitString u), name: Consider avoiding print on String}'
 - 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
 configHlintSuggestions:
 - Apply De Morgan law
 - Avoid lambda
 - Avoid lambda using `infix`
+- Consider avoiding print on String
+- Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
@@ -123,12 +129,14 @@ configHlintSuggestions:
 - Move guards forward
 - Move map inside list comprehension
 - Reduce duplication
+- Redundant do
 - Redundant take
 - Replace a fold by a strict fold
 - Too strict if
 - Too strict maybe
 - Use ++
 - Use 1
+- "Use :"
 - Use all
 - Use and
 - Use any
@@ -139,20 +147,28 @@ configHlintSuggestions:
 # - Use curry
 - Use find
 - Use floor
+- Use foldM
 - Use foldl
 - Use foldr
 - Use fromMaybe
 - Use infix
+# - Use isJust
+# - Use isNothing
 - Use lefts
 - Use list comprehension
+- Use map
 - Use map once
 - Use mapMaybe
+- Use maximum
 # - Use maybe
+- Use minimum
 - Use negate
 - Use newtype instead of data
 - Use notElem
+# - Use null
 - Use or
 - Use repeat
+- Use replicate
 - Use rights
 - Use section
 - Use splitAt
@@ -160,6 +176,8 @@ configHlintSuggestions:
 - Use tail
 - Use tuple-section
 # - Use uncurry
+- Use unless
+- Use when
 configLanguageExtensions:
 - NoTemplateHaskell
 - TupleSections
@@ -168,32 +186,98 @@ configLanguageExtensions:
 # configHlintErrors        - hlint hints to enforce
 # configGhcWarnings        - GHC warnings to provide as hints
 # configGhcErrors          - GHC warnings to enforce
--------
-module Main where
-import Control.Monad
+----------
+module Solution where
+import Prelude hiding (IO, getChar, getLine, readLn,     -- remove this line to test locally
+                       putChar, putStr, putStrLn, print) -- remove this line to test locally
+import Test.IOTasks.IOrep                                -- remove this line to test locally
+type IO = IOrep                                          -- remove this line to test locally
+
+{- In the following IO programming task, you can use the primitives
+ - listed above, as well as 'return'. If you want to test your
+ - submission locally, simply remove all the marked lines above. But
+ - for Autotool to accept your submission, those lines should be put
+ - back in, exactly as they are above.
+ -
+ - Moreover, if you first want to test locally, then depending on your
+ - operating system and settings, you might have to additionally add
+ - an 'import System.IO' and start your program in 'main' with the
+ - statement 'hSetBuffering stdout NoBuffering'. (In Autotool that
+ - statement has no effect and can be omitted, but does not hurt
+ - either. However, the potentially added line 'import System.IO' has
+ - to be removed before uploading to Autotool.)
+ -}
+
+{- Write a program which first reads a positive integer n from the
+ - console, and then reads n integers one after the other and finally
+ - outputs their sum. Your program should prompt appropriately for its
+ - inputs (indicating which number of summand is to be input next), as
+ - well as explain its final output. These text prompts/outputs are
+ - not optional.
+ -}
 
 main :: IO ()
-main = addInput 0
+main = do hSetBuffering stdout NoBuffering
+          putStr "Please enter the number (a positive integer) of summands: "
+          n <- readLn
+          loop n #{bug6} 0
 
-addInput :: Int -> IO ()
-addInput num = do
-  #{bug1}
-  if line /= "end" then do
-    #{bug2}if isNum line 
-              then return (num + #{bug4}) 
-              else do putStrLn "Input is not a number!"
-                      return num
-    addInput #{bug3}
-  else putStrLn $ "Result: " ++ #{bug5}
+loop :: Integer -> Integer -> Integer -> IO ()
+loop n i s | n #{bug1} i = do putStrLn "Input finished."
+                        let pluralize = if i == 2 then "One summand was"
+                                                  else #{bug3}
+                        putStrLn $ pluralize ++ " entered."
+                        putStrLn $ "The sum is: " ++ #{bug4}s ++ "."
+loop n i s = do putStr $ "Please enter the " ++ #{bug5}i ++ ". summand: "
+                z <- readLn
+                loop n (i+1) (s+z)
 
-getLine' :: IO String
-getLine' = do c <- getChar
-           #{bug6}if c == '\n'
-                  then return ""
-                  else do l <- getLine'
-                          return #{bug7}
+{- If you hand in a wrong solution, Autotool might throw a rather
+ - intimidating error message at you. At the top of this message you
+ - will find a sequence of input values for which your program behaves
+ - differently than what the task requires. This should hopefully be
+ - enough to fix your mistake, even if you can't make sense of the
+ - rest of the error.
+ -}
+----------
+{-# LANGUAGE TypeApplications #-}
+module Test (test) where
+import Prelude hiding (getChar, getLine, readLn, putChar, putStr, putStrLn, print)
+import qualified Solution
+import Test.QuickCheck
+import Test.HUnit ((~:), Test, Assertion, assertFailure)
+import Test.IOTasks
+import Data.Term.PTerm
 
-isNum :: String -> Bool#{bug9}
-isNum #{bug8} = elem x "1234567890" #{bug10}
+import TestHelper (qcWithTimeoutAndArgs)
 
--- Correct the Tasks above!
+test :: [ Test ]
+test =
+  [ " correct program behavior?" ~:
+    -- should work without maxSize parameter (defaults to 100) but takes longer to run
+    qcWithTimeoutAndArgs 5000000 stdArgs{maxSuccess=250, maxSize=70} $
+      Solution.main `fulfillsClever` specification
+  ]
+
+type Term = PTerm Varname
+
+specification :: Specification Term
+specification =
+  arbitraryOutput <>
+  readInput "n" nats <>
+  tillExit (
+    branch (getCurrent @Int "n" :== Length (getAll @Int "x"))
+      -- else
+      (writeOutput [anything <> var 0 <> anything] [Length (getAll @Int "x") :+ Lit 1] <>
+      readInput "x" ints
+      )
+      -- then
+      exit
+  ) <>
+  writeOutput [anything <> var 0 <> anything] [Sum $ getAll @Int "x"]
+
+optionalTextOutput :: Specification Term
+optionalTextOutput = optional arbitraryOutput
+
+arbitraryOutput :: Specification Term
+arbitraryOutput = writeFixedOutput [anything]

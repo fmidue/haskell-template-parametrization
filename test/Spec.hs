@@ -1,5 +1,3 @@
---{-# OPTIONS_GHC -F -pgmF hspec-discover #-}
-
 import Test.Hspec (hspec, describe, it, shouldNotSatisfy)
 import System.IO (openTempFile, stderr)
 import System.Random ( newStdGen, randomRIO, Random(randomRs), StdGen )
@@ -34,7 +32,7 @@ main = do
 
 -- Excluding CodeWorld tasks until the issue, to include CodeWorld, is fixed.
 excludedTasks :: [String]
-excludedTasks = ["Task01.hs", "Task03.hs", "Task04.hs", "TaskErr02.hs"]
+excludedTasks = ["Task01.hs", "Task03.hs", "Task04.hs"]
 
 allFiles :: IO [(String, String)]
 allFiles = do
