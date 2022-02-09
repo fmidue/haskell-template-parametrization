@@ -13,8 +13,6 @@ import Inter (interFile)
 import qualified Data.Map as M
 import Seed (stringToSeed, seedToString)
 import Data.List.Extra (splitOn)
-import qualified DefaultSnippets as D
-import Snippet ( Snippet (Snippet) )
 
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
@@ -210,11 +208,9 @@ modifyVarPre :: String -> [Part] -> (String, [Part])
 modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\nimport Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen (") : content ++ [Rest " ) (mkQCGen ", Placeholder "seed", Rest ") 0)"])
                           | "plain_" `isPrefixOf` name = (name, content)
                           | ":" `isInfixOf` name = (head sname, Rest ("module Snippet (" ++ normalizedName ++ ") where\n") : Rest "\n":Placeholder "plain_defaultImports" : intersperse (Rest "\n") (map Placeholder (tail sname)) ++ Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ normalizedName ++ " :: IO String\n" ++ normalizedName ++ " ="):content)
-                          | "gen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ imports ++ code ++ "\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ generateData ") : content)
                           | otherwise = (name, Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":Placeholder "plain_defaultFunctions":Rest ("\n" ++ name ++ " :: IO String\n" ++ name ++ " ="):content)
                           where normalizedName = head sname
                                 sname = splitOn ":" name
-                                Snippet (imports, code) = D.dataBuilder
 
 modifyVar :: String -> String -> String
 modifyVar name content | name == "seed" = seedToString $ stringToSeed content
