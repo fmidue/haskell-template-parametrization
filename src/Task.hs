@@ -5,7 +5,7 @@ module Task (combineToString, task, exercise, parseTask, addSimpleVar, addRawVar
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter) )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
-import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf, skipMany1)
+import Text.ParserCombinators.Parsec (manyTill, anyChar, try, string, many, (<|>), parse, char, newline, many1, lookAhead, skipMany, noneOf)
 import Language.Haskell.TH.Syntax (Lift (lift))
 import Text.Parsec.String (Parser)
 import Data.List (find, isPrefixOf, isInfixOf, intersperse)
@@ -56,7 +56,7 @@ placeholder :: Parser Part
 placeholder = string "#{" *> fmap Placeholder (manyTill anyChar (char '}'))
 
 rest :: Parser Part
-rest = fmap Rest (try (manyTill anyChar (try $ lookAhead (string "#{")))
+rest = fmap Rest (try (manyTill anyChar (try $ lookAhead (string "#{" <|> (separator >> return ""))))
                     <|> try (manyTill anyChar (lookAhead separator))
                     <|> many1 anyChar)
 
@@ -77,7 +77,7 @@ multilinePart = try placeholder <|> multilineRest
 
 codeSection :: Parser Section
 codeSection = do
-    txt <- try (manyTill part separator) <|> many1 part
+    txt <- try ((++) <$> manyTill part (try $ lookAhead separator) <*> fmap (: []) separator) <|> many1 part
     return $ Code txt
 
 placeholderDefinitions :: Parser (String, [Part])
@@ -106,8 +106,12 @@ defaultSection = do
     d <- many (placeholderDefinitions <* skipMany (string "\r"))
     return $ Data d
 
-separator :: Parser String
-separator = skipMany1 newline >> string "---" >> manyTill anyChar newline
+separator :: Parser Part
+separator = do
+    nl <- many1 newline 
+    sep <- string "---" 
+    name <- manyTill anyChar newline
+    return $ Rest (nl ++ sep ++ name ++ "\n")
 
 exercise :: Parser Task
 exercise = do

@@ -49,3 +49,4 @@ Ex.hs
 output/
 old/
 src/DefaultSnippetsTest.hs
+src/TaskTest.hs
