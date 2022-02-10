@@ -175,8 +175,7 @@ main :: IO ()
 main = do putStrLn "A single character is a palindrome:"
           quickCheck (\c -> isPalindrome [c])
           putStrLn "Adding the same character to the front and back of a string does not change the outcome of isPalindrome:"
-          quickCheck (\c str -> isPalindrome ([toUpper c] ++ str ++ [c]) == #{bug4} str) 
-                
+          quickCheck (\c str -> isPalindrome ([toUpper c] ++ str ++ [c]) == #{bug4} str)
 --------------------
 module Test (test) where
 import qualified Main
