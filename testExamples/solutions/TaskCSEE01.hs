@@ -3,7 +3,7 @@ import Data.Char (toUpper, toLower)
 import Test.QuickCheck
 
 isPalindrome :: String -> Bool
-isPalindrome list = low == reverse low
+isPalindrome list = #{rev1}low == #{rev2}low
   where low = [ toLower c | c <- list ]
 
 main :: IO ()
