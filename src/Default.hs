@@ -17,21 +17,25 @@ seed task defaults = do
     let name = "seed"
     return $ addToTask name task (addSimpleVar (name, seedToString $ stringToSeed s)) defaults
 
+-- | Adds all default functions
 defaultFunctions :: Task -> M.Map String String -> IO Task
 defaultFunctions task defaults = do
     let name = "plain_defaultFunctions"
     return $ addToTask name task (addRawVar (name, [Placeholder "plain_withCurrentSeed", Rest "\n", Placeholder "plain_withSeed", Rest "\n"])) defaults
 
+-- | Adds all default imports for every default function
 defaultImports :: Task -> M.Map String String -> IO Task
 defaultImports task defaults = do
     let name = "plain_defaultImports"
     return $ addToTask name task (addRawVar (name, [Rest (unlines (combineImports [S.withCurrentSeed, S.withSeed]))])) defaults
 
+-- | Adds function to generate data with current seed
 withCurrentSeed :: Task -> M.Map String String -> IO Task
 withCurrentSeed task defaults = do
     let name = "plain_withCurrentSeed"
     return $ addToTask name task (addRawVar (name, let Snippet (_, code) = S.withCurrentSeed in asParts code)) defaults
 
+-- | Adds function to generate data with a seed
 withSeed :: Task -> M.Map String String -> IO Task
 withSeed task defaults = do
     let name = "plain_withSeed"
@@ -42,6 +46,7 @@ dataBuilder task defaults = do
     let name = "plain_dataBuilder"
     return $ addToTask name task (addRawVar (name, let Snippet (imports, code) = S.dataBuilder in Rest imports : asParts code)) defaults
 
+-- | Adds value to disable whitespace watermarking by default
 enableWhitespaceWatermarking :: Task -> M.Map String String -> IO Task
 enableWhitespaceWatermarking task defaults = do
     let name = "enableWhitespaceWatermarking"

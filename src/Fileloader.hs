@@ -1,3 +1,11 @@
+{-|
+Module      : Fileloader
+Description : Used to translate all files
+
+Contains a simple function to load all files from a given
+folder and replaces all placeholder with the given values.
+-}
+
 module Fileloader ( loadAllTasks ) where
 
 import Task ( combineToString, parseTask )
@@ -9,7 +17,13 @@ import Default (with, seed, enableWhitespaceWatermarking, defaultImports, withCu
 import Postprocessor (whitespaceWatermarking)
 import Seed (stringToSeed)
 
-loadAllTasks :: FilePath -> IO ()
+{- | Used to transform all given files from the target folder.
+     There should be a default file 'defaults.hs' in the target folder.
+     All task should be in the tasks folder. All solutions
+     should be in the solutions folder.
+-} 
+loadAllTasks :: FilePath -- ^ target folder
+             -> IO ()
 loadAllTasks folder = do
     let tasksFolder = folder ++ "/tasks"
     let solutionsFolder = folder ++ "/solutions"

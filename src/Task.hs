@@ -1,6 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# OPTIONS_GHC -Wno-missing-methods #-}
+
+{-|
+Module      : Task
+
+Contains all important functions to parse, modify and translate a task.
+-}
+
 module Task (combineToString, task, exercise, parseTask, addSimpleVar, addRawVar, addVar, containsVar, Task, Part(Rest, Placeholder)) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter) )
@@ -16,10 +23,15 @@ import Data.List.Extra (splitOn)
 
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
-data Part = Placeholder String | Rest String deriving (Eq, Show)
+-- | Can either be a placeholder or a simple string
+data Part = Placeholder String -- ^ name of the placeholder
+          | Rest String        -- ^ simple string. Will not be changed.
+          deriving (Eq, Show)
 
+-- | Contains all task information 
 newtype Task = Task [Section] deriving (Eq, Show)
 
+-- | A QuasiQuoter to translate a task
 task :: QuasiQuoter
 task = QuasiQuoter
     taskExpr
@@ -46,6 +58,7 @@ taskExpr str = do
         Left err -> error $ show err
         Right ex -> [| ex |]
 
+-- | Used to parse tasks from a string
 parseTask :: String -> IO Task
 parseTask str =
     case parse exercise "" str of
@@ -113,6 +126,7 @@ separator = do
     name <- manyTill anyChar newline
     return $ Rest (nl ++ sep ++ name ++ "\n")
 
+-- | A parser to be used to parse the tasks
 exercise :: Parser Task
 exercise = do
     dat <- try dataSection <|> return (Data [])
@@ -126,8 +140,11 @@ exercise = do
             rs <- many codeSection
             return $ Task (dat:rs)
 
-
-combineToString :: Task -> Bool -> M.Map String String -> IO (String, M.Map String String)
+-- | Translates a given task to the ouput string and map with all placeholders
+combineToString :: Task                -- ^ the task
+                -> Bool                -- ^ is task the defaults file?
+                -> M.Map String String -- ^ default placeholders and placeholders from previous task if the given task is a solution
+                -> IO (String, M.Map String String)
 combineToString t isDefaults m = do
     let t' = if isDefaults then withAllVars t else withDefaultVars t
     (output, taskMap) <- combine t' t' M.empty m
@@ -188,7 +205,10 @@ getDataFromTask ph t@(Task (x:xs)) m ma = case x of
                                   Nothing -> getDataFromTask ph (Task xs) m ma
     Code _ -> getDataFromTask ph (Task xs) m ma
 
-containsVar :: String -> Task -> Bool
+-- | Check if a variable is defined in the task
+containsVar :: String -- ^ variable name to check
+            -> Task   -- ^ task to check
+            -> Bool
 containsVar ph (Task sections) = any f sections
    where f x = case x of
           Data d -> case find (\(name, _) -> ph == name) d of
@@ -196,13 +216,22 @@ containsVar ph (Task sections) = any f sections
             Nothing -> False
           Code _ -> False
 
-addVar :: (String, [Part]) -> Task -> Task
+-- | Used to add variable to a task
+addVar :: (String, [Part]) -- ^ should contain name and content of the var. Can also contain placeholders
+       -> Task             -- ^ variable gets added to this task
+       -> Task
 addVar (name, content) (Task sections) = Task (Data [(name, Rest ("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " = return \"") : content ++ [Rest "\""])] : sections)
 
-addRawVar :: (String, [Part]) -> Task -> Task
+-- | Used to add variable to a task but without module definition
+addRawVar :: (String, [Part]) -- ^ should contain name and content of the var. Can also contain placeholders
+          -> Task             -- ^ variable gets added to this task
+          -> Task
 addRawVar (name, content) (Task sections) = Task (Data [(name, content)] : sections)
 
-addSimpleVar :: (String, String) -> Task -> Task
+-- | Used to add a variable to a task
+addSimpleVar :: (String, String) -- ^ should contain name and content of the var
+             -> Task             -- ^ variable gets added to this task
+             -> Task
 addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " = return \"") ++ content ++ "\"")])] : sections)
 
 addSimpleRawVar :: (String, String) -> Task -> Task
