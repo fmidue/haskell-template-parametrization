@@ -1,7 +1,7 @@
 dat = return "[(\"A\",\"Maybe A | Either A A | Integer | Bool | [Bool] | [Integer]\")]"
-value12:plain_dataBuilder = return $ generateData "A" 1 2 False #{seed} #{dat}
-value345:plain_dataBuilder = return $ generateData "(A, A)" 1 2 False #{seed}1 #{dat}
-value67:plain_dataBuilder = return $ generateData "((A, A), A)" 1 2 False #{seed}2 #{dat}
+value12:plain_dataBuilder = return $ generateData "A" 1 2 #{seed} #{dat}
+value345:plain_dataBuilder = return $ generateData "(A, A)" 1 2 #{seed}1 #{dat}
+value67:plain_dataBuilder = return $ generateData "((A, A), A)" 1 2 #{seed}2 #{dat}
 
 -----
 configGhcErrors:

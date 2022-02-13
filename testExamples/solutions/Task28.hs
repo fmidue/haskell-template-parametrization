@@ -5,7 +5,7 @@ data U = #{u} deriving (Show, Read, Eq)
 data V = #{v} deriving (Show, Read, Eq)
 data W = #{w} deriving (Show, Read, Eq)
 }
-value1:plain_dataBuilder = return $ generateData "T" 0 0 False #{seed} #{dat}
+value1:plain_dataBuilder = return $ generateData "T" 0 0 #{seed} #{dat}
 value2 {
 
 #{plain_dataBuilder}
@@ -15,10 +15,10 @@ value2 = return $ getDifferentData #{seed}
 
 getDifferentData :: Int -> String
 getDifferentData seed = if "#{value1}" == dat then getDifferentData (seed + 1) else dat
-    where dat = generateData "T" 0 0 False seed #{dat}
+    where dat = generateData "T" 0 0 seed #{dat}
 
 }
-value3:plain_dataBuilder = return $ generateData "U" 1 1 False #{seed} #{dat}
+value3:plain_dataBuilder = return $ generateData "U" 1 1 #{seed} #{dat}
 value4 {
 
 #{plain_dataBuilder}
@@ -30,7 +30,7 @@ value4 = return $ getDifferentData #{seed}
 
 getDifferentData :: Int -> String
 getDifferentData seed = if head "#{value3}" == head (show k) then getDifferentData (seed + 1) else show (k, j)
-    where (k, j) = read (generateData "(U, V)" 0 1 False seed #{dat}) :: (U, V)
+    where (k, j) = read (generateData "(U, V)" 0 1 seed #{dat}) :: (U, V)
 
 }
 value5 {
@@ -44,7 +44,7 @@ value5 = return $ getDifferentData #{seed}
 
 getDifferentData :: Int -> String
 getDifferentData seed = if head (show value4) == head (show k) then getDifferentData (seed + 1) else show (k, j)
-    where (k, j) = read (generateData "(V, W)" 0 2 False seed #{dat}) :: (V, W)
+    where (k, j) = read (generateData "(V, W)" 0 2 seed #{dat}) :: (V, W)
           value4 = snd (#{value4})
 
 }
@@ -59,7 +59,7 @@ value6 = return $ getDifferentData #{seed}
 
 getDifferentData :: Int -> String
 getDifferentData seed = if head (show value5) == head (show k) || show value3 == show j || show value4 == show j then getDifferentData (seed + 1) else show (k, j)
-    where (k, j) = read (generateData "(W, U)" 0 2 False seed #{dat}) :: (W, U)
+    where (k, j) = read (generateData "(W, U)" 0 2 seed #{dat}) :: (W, U)
           value5 = snd (#{value5})
           value3 = #{value3}
           value4 = fst (#{value4})
@@ -76,7 +76,7 @@ value7 = return $ getDifferentData #{seed}
 
 getDifferentData :: Int -> String
 getDifferentData seed = if head (show value5) == head (show k)  || head (show value6) == head (show k) then getDifferentData (seed + 1) else show k
-    where k = read (generateData "W" 0 2 False seed #{dat}) :: W
+    where k = read (generateData "W" 0 2 seed #{dat}) :: W
           value5 = snd (#{value5})
           value6 = fst (#{value6})
 
