@@ -1,4 +1,11 @@
 name: ba-leon-koth
+version:             0.0.0.1
+author:              "Leon Koth"
+maintainer:          "leon.koth <at> stud.uni-due.de"
+
+extra-source-files:
+- README.md
+
 extra-source-files: []
 dependencies:
   - base
@@ -12,16 +19,6 @@ dependencies:
   - directory
   - filepath
   - time
-  - random
-  - QuickCheck
-  - hspec
-  - HUnit
-  - haskell-src-exts
-  - syb
-  - deepseq
-  - IOTasks
-  - dynamic-environment
-  - transparent-terms
 default-extensions:
   - TupleSections
   - DuplicateRecordFields
@@ -35,11 +32,17 @@ library:
   exposed-modules:
     - Task
     - Fileloader
+    - Default
+    - DefaultSnippets
+    - Inter
+    - Postprocessor
+    - Seed
+    - Snippet
   ghc-options:
     - -Wall
     - -Werror
 executables:
-  default:
+  generate-tasks:
     main: default.hs
     source-dirs: app
     dependencies:
@@ -63,3 +66,13 @@ tests:
       - ghc-paths
       - ghc-boot-th
       - directory
+      - random
+      - QuickCheck
+      - hspec
+      - HUnit
+      - haskell-src-exts
+      - syb
+      - deepseq
+      - IOTasks
+      - dynamic-environment
+      - transparent-terms

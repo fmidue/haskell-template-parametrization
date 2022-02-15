@@ -1,3 +1,9 @@
+{-|
+Module      : Default
+
+Contains default placeholders than can be added to a task.
+-}
+
 module Default ( seed, enableWhitespaceWatermarking, defaultImports, withCurrentSeed, withSeed, defaultFunctions, with ) where
 
 import Data.Time.Clock ( UTCTime(utctDay), getCurrentTime )
@@ -10,6 +16,7 @@ import Snippet (Snippet(Snippet))
 import qualified DefaultSnippets as S
 import Data.List (union)
 
+-- | Adds a generated seed from the current semester
 seed :: Task -> M.Map String String -> IO Task
 seed task defaults = do
     (year, month, _) <- getCurrentTime <&> (toGregorian . utctDay)
@@ -64,6 +71,7 @@ consume ('#':'{':xs) = ("", placeholder, tail rest)
     where (placeholder, rest) = break ('}'==) xs
 consume (x:xs) = let (a, p, rest) = consume xs in (x:a, p, rest)
 
+-- | Used to add previous defined placeholders to a task
 with :: Task -> M.Map String String -> [Task -> M.Map String String -> IO Task] -> IO Task
 with task _ [] = return task
 with task def (f:fs) = do

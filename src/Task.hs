@@ -1,5 +1,4 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# OPTIONS_GHC -Wno-missing-methods #-}
 
 {-|
@@ -8,7 +7,14 @@ Module      : Task
 Contains all important functions to parse, modify and translate a task.
 -}
 
-module Task (combineToString, task, exercise, parseTask, addSimpleVar, addRawVar, addVar, containsVar, Task, Part(Rest, Placeholder)) where
+module Task 
+    ( -- * Types
+    Task,
+    Part(Rest, Placeholder),
+    -- * Task manipulation
+    addSimpleVar, addRawVar, addVar, containsVar,
+    -- * Parser and combinator
+    combineToString, task, exercise, parseTask) where
 
 import Language.Haskell.TH.Quote ( QuasiQuoter(QuasiQuoter) )
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
@@ -21,6 +27,8 @@ import qualified Data.Map as M
 import Seed (stringToSeed, seedToString)
 import Data.List.Extra (splitOn)
 
+-- | Can either contain a section with text and placeholders
+-- or a section with all placeholder definitions
 data Section = Code [Part] | Data [(String, [Part])] deriving (Eq, Show)
 
 -- | Can either be a placeholder or a simple string
@@ -51,6 +59,7 @@ instance Lift Part where
 instance Lift Task where
     lift (Task t) = [| Task t |]
 
+-- | Used to translate to an expression
 taskExpr :: String -> Q Exp
 taskExpr str = do
     filename <- fmap loc_filename location
@@ -65,26 +74,33 @@ parseTask str =
         Left err -> error $ show err
         Right ex -> return ex
 
+-- | Parses the name of a placeholder
 placeholder :: Parser Part
 placeholder = string "#{" *> fmap Placeholder (manyTill anyChar (char '}'))
 
+-- | Reads string until placeholder, end of section or end of file
 rest :: Parser Part
 rest = fmap Rest (try (manyTill anyChar (try $ lookAhead (string "#{" <|> (separator >> return ""))))
                     <|> try (manyTill anyChar (lookAhead separator))
                     <|> many1 anyChar)
 
+-- | Reads string inside a placeholder definition until placeholder or end of line
 singlelineRest :: Parser Part
 singlelineRest = fmap Rest(try (manyTill anyChar (try $ lookAhead (string "#{" <|> string "\n"))))
 
+-- | Reads string inside a placeholder definition until placeholder or end placeholder definition
 multilineRest :: Parser Part
 multilineRest = fmap Rest(try (manyTill anyChar (try $ lookAhead (string "#{" <|> string "\n}"))))
 
+-- | Reads either a placeholder or a simple string
 part :: Parser Part
 part = try placeholder <|> rest
 
+-- | Reads either a placeholder or a simple string inside a single line placeholder
 singlelinePart :: Parser Part
 singlelinePart = try placeholder <|> singlelineRest
 
+-- | Reads either a placeholder or a simple string inside a multi line placeholder
 multilinePart :: Parser Part
 multilinePart = try placeholder <|> multilineRest
 
@@ -107,7 +123,7 @@ multilinePlaceholderDefinition :: Parser (String, [Part])
 multilinePlaceholderDefinition = do
     name <- skipMany newline >> manyTill anyChar (char '{')
     code <- manyTill multilinePart (try $ newline >> char '}')
-    return (filter (/=' ') name, if "plain_" `isPrefixOf` name then code else Rest ("module Snippet (" ++ name ++ ") where\n"):code)
+    return (filter (/=' ') name, if "plain_" `isPrefixOf` name then code else Rest ("module Snippet (" ++ name ++ ") where\n"):Placeholder "plain_defaultImports":Rest "\n":code)
 
 dataSection :: Parser Section
 dataSection = do
@@ -155,7 +171,7 @@ removeDefaults [] = ["Error."]
 removeDefaults (x:xs) = if x == "{-" then xs else removeDefaults xs
 
 defaultNames :: [String]
-defaultNames = ["seed", "enableWhitespaceWatermarking", "plain_defaultFunctions", "plain_defaultImports", "plain_withCurrentSeed"]
+defaultNames = ["seed", "enableWhitespaceWatermarking", "plain_defaultFunctions", "plain_defaultImports"]
 
 withAllVars :: Task -> Task
 withAllVars (Task sections) = Task (sections ++ [Code (Rest "\n{-\n" :map Placeholder (concatMap traverseSection sections) ++ [Rest "\n-}\n"])])
@@ -233,9 +249,6 @@ addSimpleVar :: (String, String) -- ^ should contain name and content of the var
              -> Task             -- ^ variable gets added to this task
              -> Task
 addSimpleVar (name, content) (Task sections) = Task (Data [(name, [Rest (("module Snippet (" ++ name ++ ") where\n" ++ name ++ " :: IO String\n" ++ name ++ " = return \"") ++ content ++ "\"")])] : sections)
-
-addSimpleRawVar :: (String, String) -> Task -> Task
-addSimpleRawVar (name, content) (Task sections) = Task (Data [(name, [Rest content])] : sections)
 
 modifyVarPre :: String -> [Part] -> (String, [Part])
 modifyVarPre name content | "ungen_" `isPrefixOf` name = (name, Rest ("module Snippet (" ++ name ++ ") where\nimport Data.List (isPrefixOf, isSuffixOf)\nimport Test.QuickCheck.Gen\nimport Test.QuickCheck.Random (mkQCGen)\n" ++ name ++ " :: IO String\n" ++ name ++ " = return $ if isPrefixOf \"\\\"\" str && isSuffixOf \"\\\"\" str then init (tail str) else str\n  where str = show (unGen (") : content ++ [Rest " ) (mkQCGen ", Placeholder "seed", Rest ") 0)"])

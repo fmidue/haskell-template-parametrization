@@ -1,4 +1,11 @@
 {-# OPTIONS_GHC -Wno-unused-do-bind #-}
+
+{-|
+Module      : Inter
+
+Contains function to compile and get value from code.
+-}
+
 module Inter ( interFile ) where
 
 import System.IO ( hClose, hFlush, hPutStr, openTempFile )
@@ -28,7 +35,10 @@ import Unsafe.Coerce ( unsafeCoerce )
 import Control.Exception ( finally )
 import Control.Monad (join)
 
-interFile :: String -> String -> IO String
+-- | Creates temporary file, compiles it and returns output as a string
+interFile :: String -- ^ name of the function to run
+          -> String -- ^ code to compile
+          -> IO String
 interFile name code = do
     tmp <- createTempFile code
     join $ finally (inter name tmp) (removeFile tmp)

@@ -1,6 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-missing-methods #-}
-module Snippet (snippet, Snippet (Snippet)) where
+
+{-|
+Module      : Snippet
+
+Contains QuasiQuoter for code snippets.
+-}
+
+module Snippet (Snippet (Snippet), snippet) where
 import Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 import Language.Haskell.TH.Syntax (Lift (lift))
 import Language.Haskell.TH (Exp, Q, Loc (loc_filename), location)
@@ -8,8 +15,10 @@ import Text.Parsec ( parse, newline, string, manyTill, anyChar, eof, many, skipM
 import Text.Parsec.String (Parser)
 import Text.ParserCombinators.Parsec (try)
 
+-- | Represents a code snippet with imorts and functions
 newtype Snippet = Snippet (String, String) deriving Show
 
+-- | QuasiQuoter can be used to separate functions from imports
 snippet :: QuasiQuoter
 snippet = QuasiQuoter
     snippetExpr
