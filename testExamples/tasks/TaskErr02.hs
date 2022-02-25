@@ -1,12 +1,12 @@
-rdmSelection = withCurrentSeed (shuffle [1,0,1,0,1,0,1,0])
+rdmSelection = withCurrentSeed (shuffle [1,0])
+rdmSelectionErr = withCurrentSeed (shuffle [1,0,1,0])
 bug1 = return $ [">", "<"]!!(#{rdmSelection}!!0)
-bug2 = return $ ["", "show "]!!(#{rdmSelection}!!1)
-bug3 = return $ ["(#{bug2}(i-1) ++ \" summands were\")", "#{bug2}(i-1) ++ \" summands were\""]!!(#{rdmSelection}!!2)
-bug4 = return $ ["", "show "]!!(#{rdmSelection}!!3)
-bug5 = return $ ["", "show "]!!(#{rdmSelection}!!4)
-bug6 = return $ ["0", "1"]!!(#{rdmSelection}!!5)
-bug7 = return $ ["i+1 s+z", "(i+1) (s+z)"]!!(#{rdmSelection}!!6)
-bug8 = return $ ["x:xs", "(x:xs)"]!!(#{rdmSelection}!!7)
+bug2 = return $ ["", "show "]!!(#{rdmSelectionErr}!!0)
+bug3 = return $ ["(#{bug2}(i-1) ++ \" summands were\")", "#{bug2}i-1 ++ \" summands were\""]!!(#{rdmSelectionErr}!!0)
+bug4 = return $ ["", "show "]!!(#{rdmSelectionErr}!!1)
+bug5 = return $ ["", "show "]!!(#{rdmSelectionErr}!!2)
+bug6 = return $ ["0", "1"]!!(#{rdmSelection}!!1)
+bug7 = return $ ["i+1 s+z", "(i+1) (s+z)"]!!(#{rdmSelectionErr}!!3)
 --------
 configGhcErrors:
 - deprecation
@@ -230,7 +230,7 @@ loop n i s | n #{bug1} i = do putStrLn "Input finished."
                         putStrLn $ "The sum is: " ++ #{bug4}s ++ "."
 loop n i s = do putStr $ "Please enter the " ++ #{bug5}i ++ ". summand: "
                 z <- readLn
-                loop n (i+1) (s+z)
+                loop n #{bug7}
 
 {- If you hand in a wrong solution, Autotool might throw a rather
  - intimidating error message at you. At the top of this message you
