@@ -45,7 +45,7 @@ evalTasksAndSolutions defaults ((x, y):xs) = do
     tFileContent          <- readFile x
     task                  <- parseTask tFileContent
     task'                 <- with task defaults [defaultImports, defaultFunctions, seed, enableWhitespaceWatermarking, withCurrentSeed, withSeed]
-    (taskOutput, taskMap) <- combineToString task' False defaults
+    (taskOutput, taskMap) <- combineToString task' True defaults
     sFileContent          <- readFile y
     solution              <- parseTask sFileContent
     (solutionOutput, _)   <- combineToString solution False taskMap
