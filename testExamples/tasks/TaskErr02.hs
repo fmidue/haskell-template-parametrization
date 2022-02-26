@@ -1,12 +1,11 @@
 rdmSelection = withCurrentSeed (shuffle [1,0])
 rdmSelectionErr = withCurrentSeed (shuffle [1,0,1,0])
 bug1 = return $ [">", "<"]!!(#{rdmSelection}!!0)
-bug2 = return $ ["", "show "]!!(#{rdmSelectionErr}!!0)
-bug3 = return $ ["(#{bug2}(i-1) ++ \" summands were\")", "#{bug2}i-1 ++ \" summands were\""]!!(#{rdmSelectionErr}!!0)
-bug4 = return $ ["", "show "]!!(#{rdmSelectionErr}!!1)
-bug5 = return $ ["", "show "]!!(#{rdmSelectionErr}!!2)
-bug6 = return $ ["0", "1"]!!(#{rdmSelection}!!1)
-bug7 = return $ ["i+1 s+z", "(i+1) (s+z)"]!!(#{rdmSelectionErr}!!3)
+bug2 = if #{rdmSelectionErr}!!0 == 0 then withCurrentSeed (elements ["(i-1) ++ \" summands were\"", "show i-1 ++ \" summands were\"", "show (i-1) + \" summands were\""]) else return "show (i-1) ++ \" summands were\""
+bug3 = return $ ["", "show "]!!(#{rdmSelectionErr}!!1)
+bug4 = return $ ["", "show "]!!(#{rdmSelectionErr}!!2)
+bug5 = return $ ["0", "1"]!!(#{rdmSelection}!!1)
+bug6 = return $ ["i+1 s+z", "(i+1) (s+z)"]!!(#{rdmSelectionErr}!!3)
 --------
 configGhcErrors:
 - deprecation
@@ -220,17 +219,17 @@ main :: IO ()
 main = do hSetBuffering stdout NoBuffering
           putStr "Please enter the number (a positive integer) of summands: "
           n <- readLn
-          loop n #{bug6} 0
+          loop n #{bug5} 0
 
 loop :: Integer -> Integer -> Integer -> IO ()
 loop n i s | n #{bug1} i = do putStrLn "Input finished."
                         let pluralize = if i == 2 then "One summand was"
-                                                  else #{bug3}
+                                                  else #{bug2}
                         putStrLn $ pluralize ++ " entered."
-                        putStrLn $ "The sum is: " ++ #{bug4}s ++ "."
-loop n i s = do putStr $ "Please enter the " ++ #{bug5}i ++ ". summand: "
+                        putStrLn $ "The sum is: " ++ #{bug3}s ++ "."
+loop n i s = do putStr $ "Please enter the " ++ #{bug4}i ++ ". summand: "
                 z <- readLn
-                loop n #{bug7}
+                loop n #{bug6}
 
 {- If you hand in a wrong solution, Autotool might throw a rather
  - intimidating error message at you. At the top of this message you

@@ -17,16 +17,25 @@ import Test.QuickCheck.Gen
 import Test.QuickCheck.Random (mkQCGen)
 
 withSeed :: Show a => Gen a -> Int -> IO String
-withSeed content seed = return $ if isPrefixOf "\"" str && isSuffixOf "\"" str then init (tail str) else str
-  where str = show (unGen ( content ) (mkQCGen seed) 5)|]
+withSeed content seed = return $ if isPrefixOf "\"" str && isSuffixOf "\"" str then remEsc (init (tail str)) else str
+  where str = show (unGen ( content ) (mkQCGen seed) 5)
+        remEsc [] = ""
+        remEsc ('\\':'\\':rest) = '\\':remEsc rest
+        remEsc ('\\':rest) = remEsc rest
+        remEsc (x:xs) = x:remEsc xs
+|]
 
 -- | Contains a function to generate data with a generator and the set seed
 withCurrentSeed :: Snippet
 withCurrentSeed = [snippet|import Data.List (isPrefixOf, isSuffixOf)
-import Test.QuickCheck.Gen
+import Test.QuickCheck.Gen ( Gen(unGen) )
 import Test.QuickCheck.Random (mkQCGen)
 
 withCurrentSeed :: Show a => Gen a -> IO String
-withCurrentSeed content = return $ if isPrefixOf "\"" str && isSuffixOf "\"" str then init (tail str) else str
-  where str = show (unGen ( content ) (mkQCGen #{seed}) 5)
+withCurrentSeed content = return $ if isPrefixOf "\"" str && isSuffixOf "\"" str then remEsc (init (tail str)) else str
+  where str = show (unGen content (mkQCGen #{seed}) 5)
+        remEsc [] = ""
+        remEsc ('\\':'\\':rest) = '\\':remEsc rest
+        remEsc ('\\':rest) = remEsc rest
+        remEsc (x:xs) = x:remEsc xs
 |]
