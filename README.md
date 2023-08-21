@@ -1,9 +1,9 @@
-Status: [![Haskell CI](https://github.com/fmidue/ba-leon-koth/workflows/Haskell%20CI/badge.svg)](https://github.com/fmidue/ba-leon-koth/actions?query=workflow%3A%22Haskell+CI%22+branch%3Amaster)
+Status: [![Haskell CI](https://github.com/fmidue/haskell-template-parametrization/workflows/Haskell%20CI/badge.svg)](https://github.com/fmidue/haskell-template-parametrization/actions?query=workflow%3A%22Haskell+CI%22+branch%3Amain)
 
 ## Usage guidelines
 
 - [Download](https://docs.haskellstack.org/en/stable/install_and_upgrade/) and install stack
-- Clone this repository (git clone https://github.com/fmidue/ba-leon-koth.git)
+- Clone this repository (git clone https://github.com/fmidue/haskell-template-parametrization.git)
 - Build it from the cloned directory with `stack build`
 - Use `stack exec generate-tasks "path-to-folder"` to translate tasks
 

@@ -1,4 +1,4 @@
-name: ba-leon-koth
+name: haskell-template-parametrization
 version:             0.0.0.1
 author:              "Leon Koth"
 maintainer:          "leon.koth <at> stud.uni-due.de"
@@ -46,9 +46,9 @@ executables:
     main: default.hs
     source-dirs: app
     dependencies:
-      - ba-leon-koth
+      - haskell-template-parametrization
 tests:
-  ba-leon-koth-test:
+  haskell-template-parametrization-test:
     main: Spec.hs
     source-dirs:
       - test
@@ -57,7 +57,7 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - ba-leon-koth
+      - haskell-template-parametrization
       - hspec
       - random
       - array
