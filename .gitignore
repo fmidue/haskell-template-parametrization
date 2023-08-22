@@ -40,13 +40,7 @@ cabal.sandbox.config
 .stack-work/
 .vscode/
 cabal.project.local
-cabal.project.local~
 .HTF/
 .ghc.environment.*
 
-Test.hs
-Ex.hs
 output/
-old/
-src/DefaultSnippetsTest.hs
-src/TaskTest.hs

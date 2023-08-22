@@ -66,9 +66,7 @@ tests:
       - ghc-paths
       - ghc-boot-th
       - directory
-      - random
       - QuickCheck
-      - hspec
       - HUnit
       - haskell-src-exts
       - syb
