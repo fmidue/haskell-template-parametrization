@@ -1,111 +1,49 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task05"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - missing-signatures
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-matches
 - unused-pattern-binds
 - unused-top-binds
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
-- Use drop
-- Use elem
 - Use even
-- Use fst
-- Use head
-- Use id
-- Use init
 # - Use isJust
 # - Use isNothing
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use maximum
 - Use minimum
 # - Use null
 - Use odd
-- Use otherwise
-- Use product
 - Use replicate
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: false
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- teaching
-- monomorphic
+
+#{commonConfigHlintGroups}
+
+# QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - incomplete-patterns
 - incomplete-uni-patterns
 - unused-local-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use &&
 - Use ++
 - Use 1
@@ -136,20 +74,20 @@ configHlintSuggestions:
 - Use or
 - Use repeat
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
 - Use ||
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
+
+#{commonConfigLanguageExtensions}
 ----------
-module Solution (list) where
+module #{moduleName} (list) where
 import Prelude hiding (($), (!!))
 
+-- Note that this is the first non-CodeWorld-task.
+--
 -- Write a "one-line" list comprehension implementing the following verbal
 -- description.
 --
@@ -175,7 +113,7 @@ list :: [(Integer,Integer)]
 list = undefined
 ----------
 module Test (test) where
-import qualified Solution
+import qualified #{moduleName}
 import Test.QuickCheck
 import TestHelper (qcWithTimeout)
 import Data.List (sort)
@@ -184,25 +122,25 @@ import Test.HUnit ((~:), (@=?), (@?), Test)
 test :: [ Test ]
 test =
   [ "Does the list contain any elements?"
-  ~: (not $ null Solution.list) @? "Your list is empty!"
+  ~: (not $ null #{moduleName}.list) @? "Your list is empty!"
   , "Does 'take 10 (sort list)' match the sample solution?"
-  ~: (take 10 (sort Solution.list) == take 10 list) @?
+  ~: (take 10 (sort #{moduleName}.list) == take 10 list) @?
     (unlines ["take 10 (sort list) should yield " ++ show (take 10 list)
-             ,"But your solution yields " ++ show (take 10 $ sort Solution.list)
+             ,"But your solution yields " ++ show (take 10 $ sort #{moduleName}.list)
              ])
   , "Are the bounds for x correct?"
-  ~: (99,198) `notElem` Solution.list @? "The list contains the wrong element (99,198)."
+  ~: (99,198) `notElem` #{moduleName}.list @? "The list contains the wrong element (99,198)."
   , "Are the bounds for y correct?"
-  ~: [ (100,100) `notElem` Solution.list @? "The list contains the wrong element (100,100)."
-     , (100,199) `notElem` Solution.list @? "The list contains the wrong element (17,17)."
+  ~: [ (100,100) `notElem` #{moduleName}.list @? "The list contains the wrong element (100,100)."
+     , (100,199) `notElem` #{moduleName}.list @? "The list contains the wrong element (17,17)."
      ]
   , "Does the list have the right length?"
-  ~: (length Solution.list == length list) @?
+  ~: (length #{moduleName}.list == length list) @?
     (unlines ["The list should have " ++ show (length list) ++ " elements."
-             ,"But your solution has " ++ show (length Solution.list) ++ " elements."
+             ,"But your solution has " ++ show (length #{moduleName}.list) ++ " elements."
              ])
   , " Is the list correct?"
-    ~: (sort Solution.list == list) @? "The list is not correct."
+    ~: (sort #{moduleName}.list == list) @? "The list is not correct."
   ]
 
 c :: Integer

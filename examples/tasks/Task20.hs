@@ -1,113 +1,50 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task20"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - missing-signatures
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-matches
 - unused-pattern-binds
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use odd
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: false
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
+
+#{commonConfigHlintGroups}
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - incomplete-patterns
 - incomplete-uni-patterns
 - unused-local-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - Use all
@@ -142,23 +79,16 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
 {-# LANGUAGE TupleSections #-}
-module Main where
+module #{moduleName} where
 import Prelude hiding (($))
 import Test.QuickCheck
 
@@ -198,10 +128,10 @@ main = do putStrLn "Checking prefixes:"
            )
 ----------
 module Test (test) where
-import qualified Main
+import qualified #{moduleName}
 import Test.HUnit ((~:), (@?=), Test)
 
 test :: [ Test ]
 test = [ " original == alternative" ~:
-         (Main.original == Main.alternative) @?= True
+         (#{moduleName}.original == #{moduleName}.alternative) @?= True
        ]

@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding (($), (!!), take, drop, elem, notElem, any, all, and, or, map, fmap, filter, foldr, foldl)
 import Test.QuickCheck
 

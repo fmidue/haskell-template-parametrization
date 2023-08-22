@@ -1,12 +1,14 @@
+module #{moduleName} where
+
 import CodeWorld
-import Prelude hiding (($), (!!), head, tail, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
+import Prelude hiding (($), (!!), head, tail, last, init, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
 
 -- Look at the following selection of game levels:
 --
---   https://code.world/run.html?mode=haskell&dhash=DynGTDdNu3OAk0EklMWky6Q
+--   #{link}
 --
 -- Choose one and write a program that draws it on the screen, using the
--- technique from last week's corresponding task.
+-- technique from #{otherTask}.
 --
 -- Note that, to get a better look, you can zoom into the picture at
 -- the above link, as well as move the viewed part around.

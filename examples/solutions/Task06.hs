@@ -1,12 +1,14 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 
 -- Produce a never ending animation of the day-and-night cycle, as in:
--- https://code.world/run.html?mode=haskell&dhash=DnjQ1h6dp34fkusV07_t77w
+-- #{correct}
 --
 -- You have some artistic freedom, but we want a non-full moon that
 -- holds steadily upright, as in the above animation, and *not* as in:
--- https://code.world/run.html?mode=haskell&dhash=DC3VbjP5p3C_RFIJc_9i60w
+-- #{incorrect}
 --
 -- You may (or may not) also want to prettify the moon itself, by
 -- using some other CodeWorld primitives to draw it rather than with
@@ -14,7 +16,7 @@ import Prelude hiding (($))
 --
 -- And maybe during night time you want to show some stars in the sky?
 -- As in:
--- https://code.world/run.html?mode=haskell&dhash=DLbdDNwLsQlsV_8yC4Ztd5A
+-- #{fancy}
 --
 -- Do not try to "cheat" by letting sun or moon continue to move under
 -- the ground but hiding them behind an artificially placed rectangle

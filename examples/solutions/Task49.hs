@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding ((!!))
 import Test.QuickCheck
 
@@ -22,7 +22,7 @@ divideAndConquer simpleEnough simpleCases splitFunction combineFunction =
           combineFunction (recursively left) (recursively right)
 
 {- We now want to implement Mergesort, as a typical divide-and-conquer
- - algorithm (https://en.wikipedia.org/wiki/Merge_sort).
+ - algorithm (#{wikipedia}).
  -
  - Do this by a single call to the above higher-order function. That
  - is, think of what the predicate and functions mentioned abstractly
@@ -33,7 +33,7 @@ divideAndConquer simpleEnough simpleCases splitFunction combineFunction =
  - Do really follow the divide-and-conquer principle. That is, choose
  - arguments that actually fit the roles of checking for simplicity,
  - splitting into about equally sized parts, etc., as described
- - in Task19.
+ - in #{otherTask}.
  -}
 
 sort :: [Integer] -> [Integer]

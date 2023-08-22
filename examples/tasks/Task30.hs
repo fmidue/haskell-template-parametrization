@@ -1,86 +1,33 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task30"
+wikipedia = return "https://en.wikipedia.org/wiki/Tic-tac-toe"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use odd
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: true
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
-# QuickCheck/HUnit testing happens here
+
+#{commonConfigHlintGroups}
+
+# QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - incomplete-patterns
 - incomplete-uni-patterns
@@ -88,26 +35,17 @@ configGhcWarnings:
 - unused-local-binds
 - unused-matches
 - unused-pattern-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - "Use :"
@@ -143,22 +81,15 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
-module Main where
+module #{moduleName} where
 import Test.QuickCheck
 import Data.Maybe
 import Data.List
@@ -168,7 +99,7 @@ import qualified Data.Map as Map     -- could be useful, but is optional
 
 {- Imagine we want to implement the game TicTacToe:
  -
- -   https://en.wikipedia.org/wiki/Tic-tac-toe
+ -   #{wikipedia}
  -
  - To get going, let us first focus on the representation of the
  - game board and operations on it.
@@ -258,7 +189,7 @@ instance Arbitrary Column where
   arbitrary = elements [minBound .. maxBound]
 ----------
 module Test (test) where
-import qualified Main
+import qualified #{moduleName}
 import Test.QuickCheck
 import Test.HUnit ((~:), Test, assert, Assertion, assertFailure)
 import Data.Maybe
@@ -266,19 +197,19 @@ import Data.List
 
 import TestHelper (qcWithTimeoutAndRuns)
 
-test1 :: Main.Pos -> Bool
-test1 pos = isNothing (Main.initialBoard Main.! pos)
+test1 :: #{moduleName}.Pos -> Bool
+test1 pos = isNothing (#{moduleName}.initialBoard #{moduleName}.! pos)
 
-test2 :: Main.Pos -> Bool
-test2 pos = pos `elem` Main.possibleMoves Main.initialBoard
+test2 :: #{moduleName}.Pos -> Bool
+test2 pos = pos `elem` #{moduleName}.possibleMoves #{moduleName}.initialBoard
 
 test3 :: Bool
-test3 = isNothing (Main.endPosition Main.initialBoard)
+test3 = isNothing (#{moduleName}.endPosition #{moduleName}.initialBoard)
 
 test :: [ Test ]
 test =
   [ " xPlayer /= oPlayer ?"
-    ~: assert $ Main.xPlayer /= Main.oPlayer
+    ~: assert $ #{moduleName}.xPlayer /= #{moduleName}.oPlayer
   , " initialBoard really empty (initialBoard ! pos = Nothing for all pos)?"
     ~: qcWithTimeoutAndRuns 5000 50 test1
   , " all moves possible at begin (elem pos (possibleMoves initialBoard) = True for all pos)?"
@@ -290,7 +221,7 @@ test =
           $ forAll (validSituation >>= \(moves,board,_) -> return $ HIDE2 (moves,board))
           $ \(HIDE2 (moves,board)) pos ->
                sameEntry (board ! pos)
-                         ((execute moves Main.initialBoard) Main.! pos)
+                         ((execute moves #{moduleName}.initialBoard) #{moduleName}.! pos)
   , " after arbitrary sequence of moves, correct determination of possibleMoves?"
     ~: qcWithTimeoutAndRuns 5000 50
           $ forAll (validSituation
@@ -299,8 +230,8 @@ test =
                                                          {Left _ -> False; _ -> True}))
           $ \(HIDE3 (moves,board,finished))
             -> (not finished) ==> (possibleMoves board) ==
-               (sort (nub (Main.possibleMoves (execute moves
-                                                            Main.initialBoard))))
+               (sort (nub (#{moduleName}.possibleMoves (execute moves
+                                                            #{moduleName}.initialBoard))))
   , " after arbitrary sequence of moves, no duplicates in output of possibleMoves?"
     ~: qcWithTimeoutAndRuns 5000 100
           $ forAll (validSituation
@@ -308,26 +239,26 @@ test =
                         -> return $ HIDE3 (moves,board,case outcome of
                                                          {Left _ -> False; _ -> True}))
           $ \(HIDE3 (moves,_,finished))
-            -> (not finished) ==> let mvs = Main.possibleMoves
-                                            (execute moves Main.initialBoard)
+            -> (not finished) ==> let mvs = #{moduleName}.possibleMoves
+                                            (execute moves #{moduleName}.initialBoard)
                                   in nub mvs == mvs
   , " after arbitrary sequence of moves, correct check using endPosition?"
     ~: qcWithTimeoutAndRuns 5000 100
           $ forAll (validSituation >>= \(moves,_,outcome)
                                        -> return $ INFO (moves,outcome))
           $ \(INFO (moves,outcome))
-            -> sameOutcome outcome (Main.endPosition
-                                    (execute moves Main.initialBoard))
+            -> sameOutcome outcome (#{moduleName}.endPosition
+                                    (execute moves #{moduleName}.initialBoard))
   ]
 
 elems :: (Bounded a, Enum a) => [a]
 elems = [minBound .. maxBound]
 
-validSituation :: Gen ([Main.Pos], Board, Either Player (Maybe Player))
+validSituation :: Gen ([#{moduleName}.Pos], Board, Either Player (Maybe Player))
 validSituation = do n <- elements [1..9 :: Int]
                     validPlay n [] initialBoard xPlayer
 
-validPlay :: Int -> [Main.Pos] -> Board -> Player -> Gen ([Main.Pos], Board, Either Player (Maybe Player))
+validPlay :: Int -> [#{moduleName}.Pos] -> Board -> Player -> Gen ([#{moduleName}.Pos], Board, Either Player (Maybe Player))
 validPlay n ms board player =
   case endPosition board of
     Just outcome   -> return (reverse ms, board, Right outcome)
@@ -339,36 +270,36 @@ validPlay n ms board player =
 switch :: Player -> Player
 switch (Player player) = Player (not player)
 
-execute :: [Main.Pos] -> Main.Board -> Main.Board
+execute :: [#{moduleName}.Pos] -> #{moduleName}.Board -> #{moduleName}.Board
 execute = go True
   where go _      []        board = board
         go player (move:ms) board = go (not player) ms $
-                                    Main.makeMove
-                                    (if player then Main.xPlayer
-                                               else Main.oPlayer) move board
+                                    #{moduleName}.makeMove
+                                    (if player then #{moduleName}.xPlayer
+                                               else #{moduleName}.oPlayer) move board
 
-sameEntry :: Maybe Player -> Maybe Main.Player -> Bool
+sameEntry :: Maybe Player -> Maybe #{moduleName}.Player -> Bool
 sameEntry Nothing                Nothing        = True
 sameEntry (Just (Player player)) (Just player') =
-  if player then player'==Main.xPlayer else player'==Main.oPlayer
+  if player then player'==#{moduleName}.xPlayer else player'==#{moduleName}.oPlayer
 sameEntry _                      _              = False
 
-sameOutcome :: Either a (Maybe Player) -> Maybe (Maybe Main.Player) -> Bool
+sameOutcome :: Either a (Maybe Player) -> Maybe (Maybe #{moduleName}.Player) -> Bool
 sameOutcome (Left _)                       Nothing               = True
 sameOutcome (Right Nothing)                (Just Nothing)        = True
 sameOutcome (Right (Just (Player player))) (Just (Just player')) =
-  if player then player'==Main.xPlayer else player'==Main.oPlayer
+  if player then player'==#{moduleName}.xPlayer else player'==#{moduleName}.oPlayer
 sameOutcome _                              _                     = False
 
-newtype HIDE2 = HIDE2 ([Main.Pos],Board)
+newtype HIDE2 = HIDE2 ([#{moduleName}.Pos],Board)
 instance Show HIDE2 where
   show (HIDE2 (moves,_)) = show moves ++ " (starting with " ++ show xPlayer ++ ")"
 
-newtype HIDE3 = HIDE3 ([Main.Pos],Board,Bool)
+newtype HIDE3 = HIDE3 ([#{moduleName}.Pos],Board,Bool)
 instance Show HIDE3 where
   show (HIDE3 (moves,_,_)) = show moves ++ " (starting with " ++ show xPlayer ++ ")"
 
-newtype INFO = INFO ([Main.Pos], Either Player (Maybe Player))
+newtype INFO = INFO ([#{moduleName}.Pos], Either Player (Maybe Player))
 instance Show INFO where
   show (INFO (moves,outcome)) = show moves ++ " (starting with " ++
                                 show xPlayer ++ ")\n" ++
@@ -396,15 +327,15 @@ instance Show Board where
                                                  Just (Player True) -> 'X';
                                                  Just (Player False) -> 'O'})
                                       $ l))
-             $ zip [Main.A ..] ms)
+             $ zip [#{moduleName}.A ..] ms)
 initialBoard :: Board
 initialBoard = Board $ replicate 3 $ replicate 3 Nothing
-(!) ::  Board -> Main.Pos -> Maybe Player
+(!) ::  Board -> #{moduleName}.Pos -> Maybe Player
 (Board board) ! (row, column) = board !! fromEnum row !! fromEnum column
-possibleMoves :: Board -> [Main.Pos]
+possibleMoves :: Board -> [#{moduleName}.Pos]
 possibleMoves board = filter ((== Nothing) . (board !))
                       [ (row,column) | row <- elems, column <- elems ]
-makeMove :: Player -> Main.Pos -> Board -> Board
+makeMove :: Player -> #{moduleName}.Pos -> Board -> Board
 makeMove player move board = Board [ [ if (row, column) == move
                                        then Just player
                                        else board ! (row, column)
@@ -420,12 +351,12 @@ endPosition board = case nub [ player | (m1,m2,m3) <- to_test,
                                   else Nothing
                       [player] -> Just player
                       _        -> error "IMPOSSIBLE!"
-to_test :: [((Main.Row, Main.Column), (Main.Row, Main.Column), (Main.Row, Main.Column))]
-to_test = [ ((Main.A,Main.X),(Main.A,Main.Y),(Main.A,Main.Z)),
-            ((Main.A,Main.X),(Main.B,Main.X),(Main.C,Main.X)),
-            ((Main.A,Main.X),(Main.B,Main.Y),(Main.C,Main.Z)),
-            ((Main.A,Main.Y),(Main.B,Main.Y),(Main.C,Main.Y)),
-            ((Main.A,Main.Z),(Main.B,Main.Y),(Main.C,Main.X)),
-            ((Main.A,Main.Z),(Main.B,Main.Z),(Main.C,Main.Z)),
-            ((Main.B,Main.X),(Main.B,Main.Y),(Main.B,Main.Z)),
-            ((Main.C,Main.X),(Main.C,Main.Y),(Main.C,Main.Z)) ]
+to_test :: [((#{moduleName}.Row, #{moduleName}.Column), (#{moduleName}.Row, #{moduleName}.Column), (#{moduleName}.Row, #{moduleName}.Column))]
+to_test = [ ((#{moduleName}.A,#{moduleName}.X),(#{moduleName}.A,#{moduleName}.Y),(#{moduleName}.A,#{moduleName}.Z)),
+            ((#{moduleName}.A,#{moduleName}.X),(#{moduleName}.B,#{moduleName}.X),(#{moduleName}.C,#{moduleName}.X)),
+            ((#{moduleName}.A,#{moduleName}.X),(#{moduleName}.B,#{moduleName}.Y),(#{moduleName}.C,#{moduleName}.Z)),
+            ((#{moduleName}.A,#{moduleName}.Y),(#{moduleName}.B,#{moduleName}.Y),(#{moduleName}.C,#{moduleName}.Y)),
+            ((#{moduleName}.A,#{moduleName}.Z),(#{moduleName}.B,#{moduleName}.Y),(#{moduleName}.C,#{moduleName}.X)),
+            ((#{moduleName}.A,#{moduleName}.Z),(#{moduleName}.B,#{moduleName}.Z),(#{moduleName}.C,#{moduleName}.Z)),
+            ((#{moduleName}.B,#{moduleName}.X),(#{moduleName}.B,#{moduleName}.Y),(#{moduleName}.B,#{moduleName}.Z)),
+            ((#{moduleName}.C,#{moduleName}.X),(#{moduleName}.C,#{moduleName}.Y),(#{moduleName}.C,#{moduleName}.Z)) ]

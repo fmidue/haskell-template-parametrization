@@ -1,5 +1,7 @@
+module #{moduleName} where
+
 import CodeWorld
-import Prelude hiding (($), (!!), head, tail, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
+import Prelude hiding (($), (!!), head, tail, last, init, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
 
 -- Suppose we want to implement a jump & run game. First off, we
 -- should care for level design. In a conceptually tiled world, a

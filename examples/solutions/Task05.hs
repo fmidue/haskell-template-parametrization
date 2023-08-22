@@ -1,6 +1,8 @@
-module Solution (list) where
+module #{moduleName} (list) where
 import Prelude hiding (($), (!!))
 
+-- Note that this is the first non-CodeWorld-task.
+--
 -- Write a "one-line" list comprehension implementing the following verbal
 -- description.
 --

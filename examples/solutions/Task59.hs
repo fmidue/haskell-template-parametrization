@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 
 {- Define an appropriate function 'mult' for the data type definition
  - below:

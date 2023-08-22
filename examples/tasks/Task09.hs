@@ -1,120 +1,58 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task09"
+link = return "https://code.world/run.html?mode=haskell&dhash=DWiaEAgKRHlF5Cg4mKQCv_w"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - incomplete-patterns
 - incomplete-uni-patterns
 - missing-signatures
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-matches
 - unused-pattern-binds
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
-- Use init
 # - Use isJust
 # - Use isNothing
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use maximum
 - Use minimum
 # - Use null
 - Use odd
-- Use otherwise
-- Use product
 - Use replicate
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: false
 allowModifying: true
 allowRemoving: false
-configHlintGroups:
+
+#{commonConfigHlintGroups}
 - codeworld
-- monomorphic
-- teaching
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - unused-local-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
+
+#{commonConfigHlintRules}
 - 'fixity: "infixr 0 &"'
 - 'hint: {lhs: "3.14", rhs: pi}'
 - 'hint: {lhs: "6.28", rhs: 2 * pi, name: Use pi}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
 - Redundant /=
 - Redundant ==
 - Redundant if
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use &&
 - Use ++
 - Use 1
@@ -152,22 +90,17 @@ configHlintSuggestions:
 - Use pictures
 - Use repeat
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
 - Use ||
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 import Data.Text
@@ -199,7 +132,7 @@ animation3 t
 --
 -- The outcome should look as follows:
 --
--- https://code.world/run.html?mode=haskell&dhash=DWiaEAgKRHlF5Cg4mKQCv_w
+-- #{link}
 --
 -- But remember: You are not allowed to change anything in the
 -- definitions of 'animation1', 'animation2' and 'animation3'
@@ -225,12 +158,12 @@ main :: IO ()
 main = animationOf scene
 ----------
 module Test (test) where
-import Test.HUnit ((~:), Test)
+import qualified #{moduleName}
 
-import qualified Main
+import Test.HUnit ((~:), Test)
 import TestHelper (isDeeplyDefined)
 
 test :: [ Test ]
 test =
-  [ "scene =/= undefined?" ~: isDeeplyDefined (Main.scene 1.0)
+  [ "scene =/= undefined?" ~: isDeeplyDefined (#{moduleName}.scene 1.0)
   ]

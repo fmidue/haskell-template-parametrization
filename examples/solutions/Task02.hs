@@ -1,9 +1,11 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 
 -- Draw a picture of a tree similar to:
 --
---   https://code.world/run.html?mode=haskell&dhash=DDZ_AqUvWQm3FricOIoNx7A
+--   #{link}
 --
 -- Your tree should at least consist of a trunk, two branches and some
 -- leaves/crown.

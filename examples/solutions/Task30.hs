@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Test.QuickCheck
 import Data.Maybe
 import Data.List
@@ -8,7 +8,7 @@ import qualified Data.Map as Map     -- could be useful, but is optional
 
 {- Imagine we want to implement the game TicTacToe:
  -
- -   https://en.wikipedia.org/wiki/Tic-tac-toe
+ -   #{wikipedia}
  -
  - To get going, let us first focus on the representation of the
  - game board and operations on it.

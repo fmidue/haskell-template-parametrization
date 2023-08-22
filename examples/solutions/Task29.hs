@@ -1,7 +1,7 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding (IO, getChar, getLine, readLn,     -- remove this line to test locally
                        putChar, putStr, putStrLn, print) -- remove this line to test locally
-import Test.IOTasks.IOrep                                -- remove this line to test locally
+import IOTasks.IOrep                                     -- remove this line to test locally
 type IO = IOrep                                          -- remove this line to test locally
 
 {- In the following IO programming task, you can use the primitives
@@ -22,7 +22,7 @@ type IO = IOrep                                          -- remove this line to 
 {- Write a program that reads in two integers (negative integers too)
  - and prints out their sum. This behavior is repeated until the first
  - of the two numbers read is 0. The program then terminates (not
- - reading a second number), printing the number of additions
+ - reading a second number), printing the count of additions
  - performed.
  -
  - You can add additional information to both the output of the

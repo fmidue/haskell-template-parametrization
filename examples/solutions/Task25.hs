@@ -1,8 +1,8 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding (filter, any, all)
 import Test.QuickCheck
 
--- We again want to use the divideAndConquer function from last week.
+-- We again want to use the divideAndConquer function from #{otherTask}.
 
 divideAndConquer ::
   (a -> Bool) ->
@@ -31,7 +31,7 @@ divideAndConquer simpleEnough simpleCases splitFunction combineFunction =
  - Do really follow the divide-and-conquer principle. That is, choose
  - arguments that actually fit the roles of checking for simplicity,
  - splitting into about equally sized parts, etc., as described
- - in Task19.
+ - in #{otherTask}.
  -
  - Hint: Make sure you do not forget to handle empty intervals, i.e.,
  -       intervals where the lower bound is greater than the upper

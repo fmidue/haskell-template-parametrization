@@ -1,8 +1,10 @@
+module #{moduleName} where
+
 import CodeWorld
-import Prelude hiding (($), (!!), (>>=), (=<<), (<*>), head, tail, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
+import Prelude hiding (($), (!!), (>>=), (=<<), (<*>), head, tail, last, init, take, drop, splitAt, truncate, round, ceiling, floor, fromInteger)
 import Data.Maybe
 
--- Recall the visualization of game levels from Task13. This time we
+-- Recall the visualization of game levels from #{otherTask}. This time we
 -- want to do essentially the same, but use algebraic data types and
 -- avoid list comprehensions.
 
@@ -82,7 +84,7 @@ visualize' lev = pictures (map (\x -> pictures (map (\y -> drawTile (x,y)) [-10.
   where drawTile (x,y) = translated (fromIntegral x) (fromIntegral y) (drawMaybeTile (lev (x,y)))
         drawMaybeTile = maybe blank aTile
 
--- Hint: see https://hackage.haskell.org/package/base-4.12.0.0/docs/Data-Maybe.html
+-- Hint: see #{maybeDocs}
 -- for some functions dealing with 'Maybe' values.
 
 main :: IO ()

@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding (replicate)
 
 {- A Haskell function 'replicate' should generate a list containing

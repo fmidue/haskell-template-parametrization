@@ -1,3 +1,5 @@
+module #{moduleName} where
+
 import CodeWorld hiding (blank)
 import Prelude hiding (($), (!!), null, head, tail, last, init, take, drop, splitAt)
 import Data.Text (pack)
@@ -7,7 +9,7 @@ import Data.Text (pack)
 --
 -- After you implemented the two functions, the result should look
 -- similar to:
--- https://code.world/run.html?mode=haskell&dhash=DSjC7gTCi_bE2Yy7cwjG31g
+-- #{link}
 --
 -- The 'partialCircle' should result in a rotating circle with two
 -- gaps at opposing sides. It takes a five-tuple and the animation
@@ -23,9 +25,9 @@ import Data.Text (pack)
 --
 -- Optional: For a little challenge, try modifing your program to
 -- produce an animation like:
--- https://code.world/run.html?mode=haskell&dhash=DIDA_jQC__jKNt9NWimiMkA
+-- #{fancy1}
 -- or even:
--- https://code.world/run.html?mode=haskell&dhash=DPWdRCwl_iNJcP3NOwceFxg
+-- #{fancy2}
 -- (If you do so, please provide both the basic and the modified
 -- version in your submission.)
 -- Hint: The difficulty of this modification heavily depends on how

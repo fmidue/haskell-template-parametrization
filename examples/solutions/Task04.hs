@@ -1,8 +1,10 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 import Data.Text (pack)
 
--- Extend your tree from last week with a short shaking animation you
+-- Extend your tree from #{otherTask} with a short shaking animation you
 -- would see when the leaves/crown get hit by some wind. Only the
 -- leaves and branches should move and the motion should stop after a
 -- few seconds (but the program keep running). Make sure that there
@@ -10,10 +12,10 @@ import Data.Text (pack)
 --
 -- It could look something like this:
 --
---   https://code.world/run.html?mode=haskell&dhash=Do2vyh7eJauHPLmL9QI2AHQ
+--   #{link}
 --
 -- Hint: Note that 'tree' is now a function from Double to Picture as
---       opposed to just a Picture in last week's task. This
+--       opposed to just a Picture in #{otherTask}. This
 --       additional parameter, here named t, is the number of seconds
 --       elapsed since the animation started. As additional help, the
 --       current value for t is displayed by the given template

@@ -1,113 +1,50 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task21"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 # - missing-signatures # would often show confusing type
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-matches
 - unused-pattern-binds
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use odd
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
+
+#{commonConfigHlintGroups}
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 # - incomplete-patterns # might reveal list patterns
 # - incomplete-uni-patterns # might reveal list patterns
 - unused-local-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - Use all
@@ -142,22 +79,15 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
-module Solution where
+module #{moduleName} where
 import Prelude hiding (($))
 
 -- Recall that we encode a game level as a function of type
@@ -187,7 +117,7 @@ isLessFilledThan = undefined
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE LambdaCase #-}
 module Test (test) where
-import qualified Solution
+import qualified #{moduleName}
 import TestHelper (qcWithTimeout,qcWithTimeoutAndArgs)
 import Test.HUnit (Test, (@=?), (@?), (~:))
 import Data.Function (on)
@@ -196,23 +126,23 @@ import Test.QuickCheck
 test :: [[Test]]
 test = [
   [ "Comparing air against pearl"
-    ~: True @=? (Solution.isLessFilledThan `on` value) airLevel pearlLevel
+    ~: True @=? (#{moduleName}.isLessFilledThan `on` value) airLevel pearlLevel
   , "Comparing pearl against air"
-    ~: False @=? (Solution.isLessFilledThan `on` value) pearlLevel airLevel
+    ~: False @=? (#{moduleName}.isLessFilledThan `on` value) pearlLevel airLevel
   , "Comparing air against block"
-    ~: False @=? (Solution.isLessFilledThan `on` value) airLevel blockLevel
+    ~: False @=? (#{moduleName}.isLessFilledThan `on` value) airLevel blockLevel
   , "Comparing block against air"
-    ~: False @=? (Solution.isLessFilledThan `on` value) blockLevel airLevel
+    ~: False @=? (#{moduleName}.isLessFilledThan `on` value) blockLevel airLevel
   , "Testing with matching levels:"
-    ~: qcHelp (similarLevel (-1) 1) (uncurry (Solution.isLessFilledThan `on` value))
+    ~: qcHelp (similarLevel (-1) 1) (uncurry (#{moduleName}.isLessFilledThan `on` value))
   , "Testing with different levels:"
-    ~: qcHelp (differentLevel (-1) 1) (not . uncurry (Solution.isLessFilledThan `on` value))
+    ~: qcHelp (differentLevel (-1) 1) (not . uncurry (#{moduleName}.isLessFilledThan `on` value))
   , "Testing with matching levels:"
-    ~: qcHelp (similarLevel 9 10) (uncurry (Solution.isLessFilledThan `on` value))
+    ~: qcHelp (similarLevel 9 10) (uncurry (#{moduleName}.isLessFilledThan `on` value))
   , "Testing with different levels:"
-    ~: qcHelp (differentLevel (-5) (-4)) (not . uncurry (Solution.isLessFilledThan `on` value))
+    ~: qcHelp (differentLevel (-5) (-4)) (not . uncurry (#{moduleName}.isLessFilledThan `on` value))
   , "Testing reflexivity (i.e. x `isLessFilledThan` x):"
-    ~: qcWithTimeoutAndArgs 50000 testArgs $ forAllShrink @Level @Bool (randomLevel (-1) 1) shrinkLevel (\x -> value x `Solution.isLessFilledThan` value x)
+    ~: qcWithTimeoutAndArgs 50000 testArgs $ forAllShrink @Level @Bool (randomLevel (-1) 1) shrinkLevel (\x -> value x `#{moduleName}.isLessFilledThan` value x)
   ]]
 
 qcHelp :: Gen LevelPair -> ((Level,Level) -> Bool) -> IO ()

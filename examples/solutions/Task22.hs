@@ -1,3 +1,5 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($), (!!))
 
@@ -6,7 +8,7 @@ import Prelude hiding (($), (!!))
  - has some strange wishes. But such is life as a software engineer.
  -
  - So this customer wants a certain test chart design, like this:
- - https://code.world/run.html?mode=haskell&dhash=D8vallegOLFOSRlLLYSvTkg
+ - #{correct}
  -
  - The customer's specification mentions prime numbers. Fortunately,
  - we already have a definition of the infinite list of all prime
@@ -35,7 +37,7 @@ primes = sieve [2..]
  - for larger prime numbers. That is, working with the first 4 prime
  - numbers again, the image should really be the one linked to above,
  - *not* the following one:
- - https://code.world/run.html?mode=haskell&dhash=Dex05jwjVg9D5ooT7tOybQg
+ - #{incorrect}
  -
  - Where do we get enough different colors from?
  -
@@ -49,7 +51,7 @@ primes = sieve [2..]
  - down (mostly down, with factors smaller than 1.0). So the first
  - image linked to above would be the outcome of 'scene 4 1.0', while
  - the following image would be the outcome of 'scene 10 0.3':
- - https://code.world/run.html?mode=haskell&dhash=DokcKG92ZCcopCeGgOxbEBA
+ - #{withScaling}
  -}
 
 scene :: Int -> Double -> Picture
@@ -59,9 +61,7 @@ main :: IO ()
 main = drawingOf (coordinatePlane & scene 10 0.3)
 
 {- Strange wishes by the customer indeed. But hey, the customer is
- - always king. And this customer is paying well. In fact, translated
- - for bonus point calculation, the customer is willing to pay 45%, i.e.
- - more than you could get for any task you have worked on so far.
+ - always king. And this customer is paying well.
  -
  - But wait. Unfortunately, there is not only customer-king, but also
  - technical-boss at our company. And this boss of yours is always
@@ -91,8 +91,7 @@ main = drawingOf (coordinatePlane & scene 10 0.3)
  -
  - It would also be good to come up with some meaningful function
  - names for 'f' and 'g'. (The boss was not of much help in that
- - regard. But the boss will hold back some of the customer's point
- - reward if this requirement is not met.)
+ - regard.)
  -
  - Also, do not use the !! operator or re-implementations of it.
  -}

@@ -1,3 +1,5 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 import Data.Text
@@ -29,7 +31,7 @@ animation3 t
 --
 -- The outcome should look as follows:
 --
--- https://code.world/run.html?mode=haskell&dhash=DWiaEAgKRHlF5Cg4mKQCv_w
+-- #{link}
 --
 -- But remember: You are not allowed to change anything in the
 -- definitions of 'animation1', 'animation2' and 'animation3'

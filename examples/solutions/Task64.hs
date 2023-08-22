@@ -1,7 +1,7 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding (IO, getChar, getLine, readLn,     -- remove this line to test locally
                        putChar, putStr, putStrLn, print) -- remove this line to test locally
-import Test.IOTasks.IOrep                                -- remove this line to test locally
+import IOTasks.IOrep                                     -- remove this line to test locally
 type IO = IOrep                                          -- remove this line to test locally
 
 {- In the following IO programming task, you can use the primitives

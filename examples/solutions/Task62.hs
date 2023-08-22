@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding ((!!))
 import Data.List
 import Data.Maybe
@@ -51,7 +51,7 @@ main = quickCheck test
  -
  - Hint for possible solutions:
  -
- - It's worthwhile to consider using an idea from Task 51,
+ - It's worthwhile to consider using an idea from #{otherTask},
  - specifically the generalization of decode to decode'. Try to
  - implement parse via a function parse' :: String -> (Tree Bit, String),
  - for which parse' (show t ++ s) == (t,s) should always hold.

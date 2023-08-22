@@ -1,7 +1,7 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding (IO, getChar, getLine, readLn,     -- remove this line to test locally
                        putChar, putStr, putStrLn, print) -- remove this line to test locally
-import Test.IOTasks.IOrep                                -- remove this line to test locally
+import IOTasks.IOrep                                     -- remove this line to test locally
 type IO = IOrep                                          -- remove this line to test locally
 
 {- In the following IO programming task, you can use the primitives
@@ -26,7 +26,7 @@ while a p body = loop a
  - reads a positive integer n from the console, and then reads n
  - integers one after the other and finally outputs their product.
  - Your program should prompt appropriately for its inputs (indicating
- - which number of factor is to be input next), as well as explain its
+ - which count of factor is to be input next), as well as explain its
  - final output. These text prompts/outputs are not optional.
  -
  - To solve the task, replace the occurrences of 'undefined' below.

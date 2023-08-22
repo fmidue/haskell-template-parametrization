@@ -1,14 +1,16 @@
-import CodeWorld
-import Data.Text
+module #{moduleName} where
 
--- Extend your tree program from Task04: Draw a never-ending animation
+import CodeWorld
+import Data.Text (pack)
+
+-- Extend your tree program from #{otherTask}: Draw a never-ending animation
 -- of multiple differently sized trees swaying in the wind.
 -- Additionally, the color of the leaves should change over time like
 -- it does on actual trees over the course of a year. Use the month
 -- function below to also indicate the current month.
 --
 -- For example, the result could look as follows:
--- https://code.world/run.html?mode=haskell&dhash=DnTKIZwvQ9Z27nECizOShjg
+-- #{link}
 --
 -- Try to make your solution as modular and reusable as possible.
 --

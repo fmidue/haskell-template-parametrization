@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding (($))
 
 -- Recall that we encode a game level as a function of type

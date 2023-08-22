@@ -1,5 +1,5 @@
-module Main where
-import Prelude hiding (($), sum, take, drop, tail)
+module #{moduleName} where
+import Prelude hiding (($), sum, take, drop, tail, init)
 import Test.QuickCheck
 
 {- You should know what it means, intuitively, to compute something by

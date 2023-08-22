@@ -1,121 +1,60 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task38"
+otherTask1 = return "Task30"
+otherTask2 = return "Task34"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - incomplete-patterns
 - incomplete-uni-patterns
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-local-binds
 - unused-matches
 - unused-pattern-binds
-configHlintErrors:
+
+#{commonConfigHlintErrors}
 - Avoid lambda
-- Avoid reverse
-- Collapse lambdas
 - Eta reduce
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
 - "Use :"
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use all
 - Use and
 - Use any
 - Use camelCase
 - Use concatMap
 - Use const
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use notElem
 - Use odd
 - Use or
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
+
+#{commonConfigHlintGroups}
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - missing-signatures
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
-- Avoid lambda using `infix`
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - Use catMaybes
@@ -143,7 +82,6 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
@@ -151,27 +89,21 @@ configHlintSuggestions:
 # - Use uncurry
 - Use unless
 - Use when
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
 {-# LANGUAGE StandaloneDeriving #-}
-module Solution where
+module #{moduleName} where
 import Data.List
 import Data.Maybe
 
-import Task30 (Pos, Player, xPlayer, oPlayer)
-import Task34 (GameTree(..))
+import #{otherTask1} (Pos, Player, xPlayer, oPlayer)
+import #{otherTask2} (GameTree(..))
 
 {- Let's continue our series of TicTacToe tasks.
  -
  - The goal is now, based on the 'GameTree' structure from the
- - preceding task (Task 34), to determine the best possible move and
+ - preceding task (#{otherTask2}), to determine the best possible move and
  - the winning prospects of that move, for a player.
  -
  - So, for a given player and non-empty list of pairs (as in the
@@ -250,10 +182,10 @@ import Test.QuickCheck
 
 import TestHelper (qcWithTimeoutAndRuns)
 
-import Task30 (Pos, Player, Board, xPlayer, oPlayer, initialBoard,
+import #{otherTask1} (Pos, Player, Board, xPlayer, oPlayer, initialBoard,
                possibleMoves, makeMove, endPosition)
-import Task34 (GameTree (..), outlook, switch)
-import qualified Solution (bestMove)
+import #{otherTask2} (GameTree (..), outlook, switch)
+import qualified #{moduleName} (bestMove)
 
 test :: [ HU.Test ]
 test =
@@ -263,7 +195,7 @@ test =
                      return $ INFO (l,player,tree, bestMoves (player, fromJust tree))) $
             \(INFO (l,player,tree,best))
             -> (l >= 6 && isJust tree)
-               ==>  okay best (Solution.bestMove player (fromContinue $ fromJust tree))
+               ==>  okay best (#{moduleName}.bestMove player (fromContinue $ fromJust tree))
   ]
 
 fromContinue :: GameTree -> [(Pos,GameTree)]
@@ -330,7 +262,7 @@ lookups a ((a',b):rest) = if a/=a' then lookups a rest else
                             Just bs -> Just (b:bs)
 
 ----------
-module Task30 (Pos, Player, Board, xPlayer, oPlayer, initialBoard, (!),
+module #{otherTask1} (Pos, Player, Board, xPlayer, oPlayer, initialBoard, (!),
                possibleMoves, makeMove, endPosition) where
 import Data.Maybe
 import Data.List
@@ -407,10 +339,10 @@ elems = [minBound .. maxBound]
 moves :: [Pos]
 moves = [ (row,column) | row <- elems, column <- elems ]
 ----------
-module Task34 (GameTree (..), outlook, switch) where
+module #{otherTask2} (GameTree (..), outlook, switch) where
 import Prelude
 import Data.Maybe
-import Task30 (Pos, Player, Board, xPlayer, oPlayer,
+import #{otherTask1} (Pos, Player, Board, xPlayer, oPlayer,
                possibleMoves, makeMove, endPosition)
 
 switch :: Player -> Player

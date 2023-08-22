@@ -1,9 +1,11 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 import Data.Text (pack)
 
 -- Draw a rising, moving, then setting sun, as in the sample animation
--- https://code.world/run.html?mode=haskell&dhash=DYBPZOMntsydDgOvvqQNsPQ
+-- #{link}
 --
 -- You need not have the exact same positions of the sun at the
 -- beginning and end as in our sample animation. For example, the sun
@@ -19,8 +21,8 @@ import Data.Text (pack)
 -- You can work with elementary trigonometry for this task. If you
 -- need to refresh your knowledge of trigonometric functions and their
 -- connection to circular motion, you may want to have a look at
--- https://en.wikipedia.org/wiki/Unit_circle as well as
--- https://www.geogebra.org/m/Jgt2n9ah
+-- #{wikipedia} as well as
+-- #{geogebra}
 --
 -- Of course, you can also work with CodeWorld's 'rotated' function
 -- instead.
@@ -29,7 +31,7 @@ import Data.Text (pack)
 -- not in degrees.
 --
 -- Hint: Note that 'scene' is now a function from Double to Picture as
---       opposed to just a Picture in last week's task. This
+--       opposed to just a Picture in #{otherTask}. This
 --       additional parameter, here named t, is the number of seconds
 --       elapsed since the animation started. As additional help, the
 --       current value for t is displayed by the given template

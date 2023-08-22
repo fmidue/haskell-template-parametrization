@@ -1,15 +1,15 @@
 {-# LANGUAGE StandaloneDeriving #-}
-module Solution where
+module #{moduleName} where
 import Data.List
 import Data.Maybe
 
-import Task30 (Pos, Player, xPlayer, oPlayer)
-import Task34 (GameTree(..))
+import #{otherTask1} (Pos, Player, xPlayer, oPlayer)
+import #{otherTask2} (GameTree(..))
 
 {- Let's continue our series of TicTacToe tasks.
  -
  - The goal is now, based on the 'GameTree' structure from the
- - preceding task (Task 34), to determine the best possible move and
+ - preceding task (#{otherTask2}), to determine the best possible move and
  - the winning prospects of that move, for a player.
  -
  - So, for a given player and non-empty list of pairs (as in the

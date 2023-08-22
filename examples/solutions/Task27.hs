@@ -1,8 +1,8 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding ((!!))
 import Test.QuickCheck
 import Data.Maybe -- contains useful functions like isNothing, isJust,
-                  -- and fromJust; but do also consider slide 160
+                  -- and fromJust; but do also consider slide #{slide}
 
 {- Consider the following two enumeration types
  - (but ignore the 'deriving' stuff):

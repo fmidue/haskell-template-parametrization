@@ -1,91 +1,37 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Solution"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
 - Redundant return
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
 - Use let
-- Use list literal pattern
 - Use odd
-- Use otherwise
 - Use print
-- Use product
 - Use putStr
 - Use putStrLn
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
+
+#{commonConfigHlintGroups}
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - incomplete-patterns
 - incomplete-uni-patterns
@@ -95,35 +41,26 @@ configGhcWarnings:
 - unused-pattern-binds
 - unused-do-bind
 - wrong-do-bind
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: Test.IOTasks.IOrep.putStrLn (show x), rhs: Test.IOTasks.IOrep.print x}'
-- 'warn: {lhs: Test.IOTasks.IOrep.putStr (x ++ "\n"), rhs: Test.IOTasks.IOrep.putStrLn x}'
-- 'warn: {lhs: Test.IOTasks.IOrep.putStr (x ++ y ++ "\n"), rhs: Test.IOTasks.IOrep.putStrLn (x ++ y)}'
-- 'warn: {lhs: mapM_ Test.IOTasks.IOrep.putChar, rhs: Test.IOTasks.IOrep.putStr}'
-- 'hint: {lhs: Test.IOTasks.IOrep.print s, rhs: Test.IOTasks.IOrep.putStrLn s, side: isLitString s, name: Consider avoiding print on String}'
-- 'hint: {lhs: Test.IOTasks.IOrep.print (s ++ t), rhs: Test.IOTasks.IOrep.putStrLn (s ++ t), side: isLitString s || isLitString t, name: Consider avoiding print on String}'
-- 'hint: {lhs: Test.IOTasks.IOrep.print (s ++ t ++ u), rhs: Test.IOTasks.IOrep.putStrLn (s ++ t ++ u), side: not (isLitString s) && (isLitString t || isLitString u), name: Consider avoiding print on String}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+- 'warn: {lhs: IOTasks.IOrep.putStrLn (show x), rhs: IOTasks.IOrep.print x}'
+- 'warn: {lhs: IOTasks.IOrep.putStr (x ++ "\n"), rhs: IOTasks.IOrep.putStrLn x}'
+- 'warn: {lhs: IOTasks.IOrep.putStr (x ++ y ++ "\n"), rhs: IOTasks.IOrep.putStrLn (x ++ y)}'
+- 'warn: {lhs: mapM_ IOTasks.IOrep.putChar, rhs: IOTasks.IOrep.putStr}'
+- 'hint: {lhs: IOTasks.IOrep.print s, rhs: IOTasks.IOrep.putStrLn s, side: isLitString s, name: Consider avoiding print on String}'
+- 'hint: {lhs: IOTasks.IOrep.print (s ++ t), rhs: IOTasks.IOrep.putStrLn (s ++ t), side: isLitString s || isLitString t, name: Consider avoiding print on String}'
+- 'hint: {lhs: IOTasks.IOrep.print (s ++ t ++ u), rhs: IOTasks.IOrep.putStrLn (s ++ t ++ u), side: not (isLitString s) && (isLitString t || isLitString u), name: Consider avoiding print on String}'
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Consider avoiding print on String
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
 - Redundant do
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - "Use :"
@@ -160,7 +97,6 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
@@ -168,19 +104,13 @@ configHlintSuggestions:
 # - Use uncurry
 - Use unless
 - Use when
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
-module Solution where
+module #{moduleName} where
 import Prelude hiding (IO, getChar, getLine, readLn,     -- remove this line to test locally
                        putChar, putStr, putStrLn, print) -- remove this line to test locally
-import Test.IOTasks.IOrep                                -- remove this line to test locally
+import IOTasks.IOrep                                     -- remove this line to test locally
 type IO = IOrep                                          -- remove this line to test locally
 
 {- In the following IO programming task, you can use the primitives
@@ -219,42 +149,40 @@ main = undefined
 ----------
 {-# LANGUAGE TypeApplications #-}
 module Test (test) where
-import Prelude hiding (getChar, getLine, readLn, putChar, putStr, putStrLn, print)
-import qualified Solution
-import Test.QuickCheck
+import Prelude hiding (getChar, getLine, readLn, putChar, putStr, putStrLn, print, all)
+import qualified #{moduleName}
 import Test.HUnit ((~:), Test, Assertion, assertFailure)
-import Test.IOTasks
-import Data.Term.PTerm
+import IOTasks
 
-import TestHelper (qcWithTimeoutAndArgs)
+import TestHelper (tcWithTimeoutAndArgs)
 
 test :: [ Test ]
 test =
   [ " correct program behavior?" ~:
     -- should work without maxSize parameter (defaults to 100) but takes longer to run
-    qcWithTimeoutAndArgs 5000000 stdArgs{maxSuccess=250, maxSize=70} $
-      Solution.main `fulfillsClever` specification
+    tcWithTimeoutAndArgs 5000000 stdArgs {verbose = False}
+      #{moduleName}.main
+      specification
   ]
 
-type Term = PTerm Varname
-
-specification :: Specification Term
+specification :: Specification
 specification =
   arbitraryOutput <>
-  readInput "n" nats <>
+  readInput n pos AssumeValid <>
   tillExit (
-    branch (getCurrent @Int "n" :== Length (getAll @Int "x"))
-      -- else
-      (writeOutput [anything <> var 0 <> anything] [Length (getAll @Int "x") :+ Lit 1] <>
-      readInput "x" ints
-      )
+    branch (currentValue n .==. length' (as @[Integer] $ allValues x))
       -- then
       exit
+      -- else
+      (writeOutput [Wildcard <> Value (length' (as @[Integer] $ allValues x) .+. intLit 1) <> Wildcard] <>
+      readInput x ints AssumeValid
+      )
   ) <>
-  writeOutput [anything <> var 0 <> anything] [Sum $ getAll @Int "x"]
+  writeOutput [Wildcard <> Value (sum' $ allValues x) <> Wildcard]
+  where
+    n = intVar "n"
+    x = intVar "x"
 
-optionalTextOutput :: Specification Term
-optionalTextOutput = optional arbitraryOutput
-
-arbitraryOutput :: Specification Term
-arbitraryOutput = writeFixedOutput [anything]
+ints, pos :: ValueSet Integer
+ints = Every
+pos = GreaterThan 0

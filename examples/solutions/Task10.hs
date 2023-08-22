@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding (($), (!!), map, foldr)
 import Data.Char (toUpper, toLower)
 import Test.QuickCheck

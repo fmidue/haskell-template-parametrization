@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding ((!!), head, take, drop, length)
 
 {- Implement a function 'dropEven' in Haskell which, given a list,

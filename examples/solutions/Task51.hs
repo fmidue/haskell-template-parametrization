@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Test.HUnit
 import Data.List (nub)
 

@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 import Prelude hiding ((!!), head, tail, last, init, take, drop, takeWhile, dropWhile)
 
 {- Write a variant of the 'filter' function, named 'takeWhile'.

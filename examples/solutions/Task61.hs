@@ -1,4 +1,4 @@
-module Solution where
+module #{moduleName} where
 import Test.HUnit ((@?=),(~:),runTestTT,Test(TestList))
 
 -- Define, for the following algebraic data type:

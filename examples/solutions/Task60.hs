@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Prelude hiding ((!!))
 import Test.HUnit
 import Test.QuickCheck

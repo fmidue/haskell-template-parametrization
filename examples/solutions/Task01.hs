@@ -1,3 +1,5 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 
@@ -5,7 +7,7 @@ import Prelude hiding (($))
 -- not behind it!
 --
 -- As guidance, the result should look roughly like this:
--- https://code.world/run.html?mode=haskell&dhash=DEpssmhzFT22fqxwW2yXJVQ
+-- #{link}
 --
 -- Consider the examples from the lecture and also look up how to
 -- produce and transform relevant shapes in the CodeWorld

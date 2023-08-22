@@ -1,18 +1,18 @@
-module Solution where
+module #{moduleName} where
 import Data.List
 import Data.Maybe
-import Task30 (Row(..), Column(..), Pos, Player, Board,
+import #{otherTask} (Row(..), Column(..), Pos, Player, Board,
                xPlayer, oPlayer, initialBoard,
                possibleMoves, makeMove, endPosition)
 
 {- Let's continue the TicTacToe task. Assume that the implementations
- - from Task 30, as imported above, are given. But you are not
+ - from #{otherTask}, as imported above, are given. But you are not
  - supposed to have internal access to the 'Player' and 'Board'
  - representations here, instead you can only access them via the
  - imported functions.
  -
- - If you have no own correct solution for Task 30, you can work
- - (locally) with the solution from collection.pdf.
+ - If you have no own correct solution for #{otherTask}, you can work
+ - (locally) with the solution from #{collection}.
  -
  - Additionally the following helper function is given:
  -}
@@ -63,7 +63,7 @@ outlook player board =
  -     B:X X O
  -     C:. . O
  -
- -   and it is xPlayer's turn, then the correct value of
+ -   and it is xPlayer's turn, then a correct value of
  -   'outlook xPlayer exampleBoard' is:
  -
  -     Continue [ ((A,Z), Continue [ ((C,X), Continue [ ((C,Y), Draw) ])

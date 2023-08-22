@@ -1,8 +1,8 @@
-module Main where
+module #{moduleName} where
 import Test.HUnit
 import Data.List (nub)
 
-{- Read up on https://hoogle.haskell.org about the type constructor
+{- Read up at #{hoogle} about the type constructor
  - Either.
  -
  - Then give concrete, different, finite values of the following

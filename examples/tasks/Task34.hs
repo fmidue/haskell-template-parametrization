@@ -1,86 +1,34 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task34"
+otherTask = return "Task30"
+collection = return "collection.pdf"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - name-shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use odd
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
-- monomorphic
-- teaching
+
+#{commonConfigHlintGroups}
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 - incomplete-patterns
 - incomplete-uni-patterns
@@ -88,26 +36,17 @@ configGhcWarnings:
 - unused-local-binds
 - unused-matches
 - unused-pattern-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintRules}
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - "Use :"
@@ -143,7 +82,6 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
@@ -151,30 +89,24 @@ configHlintSuggestions:
 # - Use uncurry
 - Use unless
 - Use when
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
-module Solution where
+module #{moduleName} where
 import Data.List
 import Data.Maybe
-import Task30 (Row(..), Column(..), Pos, Player, Board,
+import #{otherTask} (Row(..), Column(..), Pos, Player, Board,
                xPlayer, oPlayer, initialBoard,
                possibleMoves, makeMove, endPosition)
 
 {- Let's continue the TicTacToe task. Assume that the implementations
- - from Task 30, as imported above, are given. But you are not
+ - from #{otherTask}, as imported above, are given. But you are not
  - supposed to have internal access to the 'Player' and 'Board'
  - representations here, instead you can only access them via the
  - imported functions.
  -
- - If you have no own correct solution for Task 30, you can work
- - (locally) with the solution from collection.pdf.
+ - If you have no own correct solution for #{otherTask}, you can work
+ - (locally) with the solution from #{collection}.
  -
  - Additionally the following helper function is given:
  -}
@@ -216,7 +148,7 @@ outlook = undefined
  -     B:X X O
  -     C:. . O
  -
- -   and it is xPlayer's turn, then the correct value of
+ -   and it is xPlayer's turn, then a correct value of
  -   'outlook xPlayer exampleBoard' is:
  -
  -     Continue [ ((A,Z), Continue [ ((C,X), Continue [ ((C,Y), Draw) ])
@@ -263,18 +195,18 @@ import TestHelper (qcWithTimeoutAndRuns)
 import Test.HUnit (Test,(@?=),(~:),assert)
 import Test.QuickCheck
 
-import Task30 (Player, Board, xPlayer, oPlayer, initialBoard,
+import #{otherTask} (Player, Board, xPlayer, oPlayer, initialBoard,
                possibleMoves, makeMove, endPosition)
-import Solution (switch)
-import qualified Solution
+import #{moduleName} (switch)
+import qualified #{moduleName}
 
 test :: [Test]
 test =
   [ " correct behaviour of outlook?" ~:
-      qcWithTimeoutAndRuns 5000 350 $ forAll (validSituation >>= \(l,board,player) ->
+      qcWithTimeoutAndRuns 500000 350 $ forAll (validSituation >>= \(l,board,player) ->
                     return $ INFO (l,board,player,outlook player board)) $
            \(INFO (l,board,player,tree))
-           -> l >= 6  ==>  sameOutlook tree (Solution.outlook player board)
+           -> l >= 6  ==>  sameOutlook tree (#{moduleName}.outlook player board)
   ]
 
 validSituation :: Gen (Int, Board, Player)
@@ -291,36 +223,36 @@ validPlay n l board player =
                                                (switch player)
     Nothing -> error "impossible!"
 
-sameOutlook :: Solution.GameTree -> Solution.GameTree -> Bool
-sameOutlook Solution.Lost                 Solution.Lost                 = True
-sameOutlook Solution.Draw                 Solution.Draw                 = True
-sameOutlook (Solution.Continue outcomes1) (Solution.Continue outcomes2) =
+sameOutlook :: #{moduleName}.GameTree -> #{moduleName}.GameTree -> Bool
+sameOutlook #{moduleName}.Lost                 #{moduleName}.Lost                 = True
+sameOutlook #{moduleName}.Draw                 #{moduleName}.Draw                 = True
+sameOutlook (#{moduleName}.Continue outcomes1) (#{moduleName}.Continue outcomes2) =
   let outcomes2' = sortBy (\(m,_) (m',_) -> compare m m') outcomes2
   in (length outcomes1 == length outcomes2') &&
      all (\((m1,out1),(m2,out2)) -> m1==m2 && sameOutlook out1 out2)
          (zip outcomes1 outcomes2')
 sameOutlook _                    _                    = False
 
-newtype INFO = INFO (Int,Board,Player,Solution.GameTree)
+newtype INFO = INFO (Int,Board,Player,#{moduleName}.GameTree)
 instance Show INFO where
   show (INFO (_,board,player,tree)) =
     show player ++ "'s turn" ++ show board ++
     "outcome should have been (modulo reordering of lists): " ++ show tree
 
-outlook :: Player -> Board -> Solution.GameTree
+outlook :: Player -> Board -> #{moduleName}.GameTree
 outlook player board =
   case (finished,winner) of
-    (Nothing,_)               -> Solution.Continue
+    (Nothing,_)               -> #{moduleName}.Continue
                                           [ (move, outlook (switch player) $
                                                    makeMove player move board)
                                           | move <- possibleMoves board ]
-    (_,Nothing)               -> Solution.Draw
-    (_,Just p) | p /= player  -> Solution.Lost
+    (_,Nothing)               -> #{moduleName}.Draw
+    (_,Just p) | p /= player  -> #{moduleName}.Lost
     (Just _,Just _)           -> error "impossible!"
   where  finished = endPosition board
          winner = fromJust finished
 -------------------------------------
-module Task30 (Row(..), Column(..), Pos, Player, Board, xPlayer, oPlayer, initialBoard, (!),
+module #{otherTask} (Row(..), Column(..), Pos, Player, Board, xPlayer, oPlayer, initialBoard, (!),
                possibleMoves, makeMove, endPosition) where
 import Data.Maybe
 import Data.List

@@ -1,3 +1,5 @@
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($))
 
@@ -16,7 +18,7 @@ import Prelude hiding (($))
 --
 -- Overall, the result could look as follows:
 --
---   https://code.world/run.html?mode=haskell&dhash=DsF4psfXjd1h15OlncXT00w
+--   #{link}
 --
 -- Make sure that the animation is smooth as in this example (no jumps).
 --

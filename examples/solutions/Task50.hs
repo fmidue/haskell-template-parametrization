@@ -1,4 +1,4 @@
-module Main where
+module #{moduleName} where
 import Test.QuickCheck
 
 {- Here is a recursive function on lists of integers. It is not really

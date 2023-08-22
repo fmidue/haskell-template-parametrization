@@ -1,5 +1,5 @@
-module Main where
-import Prelude hiding (($), (!!), tail, take, drop, foldr, foldl, sum)
+module #{moduleName} where
+import Prelude hiding (($), (!!), tail, init, take, drop, foldr, foldl, sum)
 import Test.QuickCheck
 
 {-

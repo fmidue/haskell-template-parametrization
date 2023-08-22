@@ -1,5 +1,5 @@
 {-# LANGUAGE TupleSections #-}
-module Main where
+module #{moduleName} where
 import Prelude hiding (($))
 import Test.QuickCheck
 

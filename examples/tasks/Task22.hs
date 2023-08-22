@@ -1,117 +1,57 @@
-configGhcErrors:
-- deprecation
-- empty-enumerations
-- identities
+enableWhitespaceWatermarking = return "True"
+moduleName = return "Task22"
+correct = return "https://code.world/run.html?mode=haskell&dhash=D8vallegOLFOSRlLLYSvTkg"
+incorrect = return "https://code.world/run.html?mode=haskell&dhash=Dex05jwjVg9D5ooT7tOybQg"
+withScaling = return "https://code.world/run.html?mode=haskell&dhash=DokcKG92ZCcopCeGgOxbEBA"
+----------
+# the seed used was: #{seed}
+
+#{commonConfigGhcErrors}
 - missing-signatures
 # - name-shadowing # in the interest of easy abstracting over 'primes' and 'assortedColors' in g, allow shadowing
-- overflowed-literals
-- overlapping-patterns
-- tabs
 - unused-matches
 - unused-pattern-binds
-configHlintErrors:
-- Avoid reverse
-- Collapse lambdas
-- Evaluate
-- Length always non-negative
-- Move brackets to avoid $
-- Redundant $
+
+#{commonConfigHlintErrors}
 - Redundant /=
 - Redundant ==
 - Redundant bracket
-- Redundant flip
-- Redundant fromInteger
-- Redundant fromIntegral
-- Redundant guard
-- Redundant id
 - Redundant if
-- Redundant lambda
-- Redundant list comprehension
-- Redundant maybe
-- Redundant multi-way if
-- Redundant negate
-- Redundant not
-- Redundant pair
-- Redundant section
-- Use !!
 - Use &&
-- Use /=
-- Use <
-- Use <=
-- Use ==
-- Use >
-- Use >=
-- Use String
 - Use camelCase
-- Use drop
-- Use elem
 - Use even
-- Use fst
 - Use guards
-- Use head
-- Use id
 - Use if
-- Use init
-- Use last
-- Use left fold instead of right fold
-- Use list literal pattern
 - Use odd
-- Use otherwise
-- Use product
-- Use right fold instead of left fold
-- Use snd
-- Use sum
-- Use take
 - Use ||
-- Used otherwise as a pattern
-- Using all on tuple
-- Using and on tuple
-- Using any on tuple
-- Using concat on tuple
-- Using elem on tuple
-- Using foldr on tuple
-- Using length on tuple
-- Using maximum on tuple
-- Using minimum on tuple
-- Using null on tuple
-- Using or on tuple
-- Using product on tuple
-- Using sum on tuple
+
 allowAdding: true
 allowModifying: false
 allowRemoving: false
-configHlintGroups:
+
+#{commonConfigHlintGroups}
 - codeworld
-- monomorphic
-- teaching
+
 # QuickCheck/HUnit testing follows the template check
+
 configGhcWarnings:
 # - incomplete-patterns # might reveal list patterns
 # - incomplete-uni-patterns # might reveal list patterns
 - unused-local-binds
-configHlintRules:
-- 'hint: {lhs: drop 1, rhs: tail, note: "Be careful about empty lists, though"}'
+
+#{commonConfigHlintRules}
 - 'fixity: "infixr 0 &"'
 - 'hint: {lhs: "3.14", rhs: pi}'
 - 'hint: {lhs: "6.28", rhs: 2 * pi, name: Use pi}'
-- 'warn: {lhs: last (take n x), rhs: x !! (n - 1), note: Check carefully that there is no possibility for index-too-large error}'
-- 'warn: {lhs: foldr f c (reverse x), rhs: foldl'' (flip f) c x, note: "reduces laziness", name: Replace a fold by a strict fold}'
-configHlintSuggestions:
+
+#{commonConfigHlintSuggestions}
 - Apply De Morgan law
 - Avoid lambda
-- Avoid lambda using `infix`
 # - Eta reduce
 - Fuse concatMap/map
 - Fuse foldr/map
 - Fuse mapMaybe/map
 - Hoist not
-- Move guards forward
-- Move map inside list comprehension
-- Reduce duplication
-- Redundant take
-- Replace a fold by a strict fold
-- Too strict if
-- Too strict maybe
 - Use ++
 - Use 1
 - Use all
@@ -154,21 +94,16 @@ configHlintSuggestions:
 - Use repeat
 - Use replicate
 - Use rights
-- Use section
 - Use splitAt
 - Use sqrt
 - Use tail
 - Use tuple-section
 # - Use uncurry
-configLanguageExtensions:
-- NoTemplateHaskell
-- TupleSections
-# configLanguageExtensions - this sets LanguageExtensions for hlint as well
-# configHlintSuggestions   - hlint hints to provide
-# configHlintErrors        - hlint hints to enforce
-# configGhcWarnings        - GHC warnings to provide as hints
-# configGhcErrors          - GHC warnings to enforce
+
+#{commonConfigLanguageExtensions}
 ----------
+module #{moduleName} where
+
 import CodeWorld
 import Prelude hiding (($), (!!))
 
@@ -177,7 +112,7 @@ import Prelude hiding (($), (!!))
  - has some strange wishes. But such is life as a software engineer.
  -
  - So this customer wants a certain test chart design, like this:
- - https://code.world/run.html?mode=haskell&dhash=D8vallegOLFOSRlLLYSvTkg
+ - #{correct}
  -
  - The customer's specification mentions prime numbers. Fortunately,
  - we already have a definition of the infinite list of all prime
@@ -206,7 +141,7 @@ primes = sieve [2..]
  - for larger prime numbers. That is, working with the first 4 prime
  - numbers again, the image should really be the one linked to above,
  - *not* the following one:
- - https://code.world/run.html?mode=haskell&dhash=Dex05jwjVg9D5ooT7tOybQg
+ - #{incorrect}
  -
  - Where do we get enough different colors from?
  -
@@ -220,7 +155,7 @@ primes = sieve [2..]
  - down (mostly down, with factors smaller than 1.0). So the first
  - image linked to above would be the outcome of 'scene 4 1.0', while
  - the following image would be the outcome of 'scene 10 0.3':
- - https://code.world/run.html?mode=haskell&dhash=DokcKG92ZCcopCeGgOxbEBA
+ - #{withScaling}
  -}
 
 scene :: Int -> Double -> Picture
@@ -230,9 +165,7 @@ main :: IO ()
 main = drawingOf (coordinatePlane & scene 10 0.3)
 
 {- Strange wishes by the customer indeed. But hey, the customer is
- - always king. And this customer is paying well. In fact, translated
- - for bonus point calculation, the customer is willing to pay 45%, i.e.
- - more than you could get for any task you have worked on so far.
+ - always king. And this customer is paying well.
  -
  - But wait. Unfortunately, there is not only customer-king, but also
  - technical-boss at our company. And this boss of yours is always
@@ -262,19 +195,18 @@ main = drawingOf (coordinatePlane & scene 10 0.3)
  -
  - It would also be good to come up with some meaningful function
  - names for 'f' and 'g'. (The boss was not of much help in that
- - regard. But the boss will hold back some of the customer's point
- - reward if this requirement is not met.)
+ - regard.)
  -
  - Also, do not use the !! operator or re-implementations of it.
  -}
 ----------
 module Test (test) where
-import qualified Main
+import qualified #{moduleName}
 import Test.HUnit ((~:), Test)
 
 import TestHelper (isDeeplyDefined)
 
 test :: [ Test ]
 test =
-  [ "scene =/= undefined?" ~: isDeeplyDefined (Main.scene 10 0.3)
+  [ "scene =/= undefined?" ~: isDeeplyDefined (#{moduleName}.scene 10 0.3)
   ]
