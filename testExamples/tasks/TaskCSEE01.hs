@@ -163,6 +163,8 @@ module Main where
 import Data.Char (toUpper, toLower)
 import Test.QuickCheck
 
+-- introduce sharing to avoid common subexpressions
+
 isPalindrome :: String -> Bool
 isPalindrome list = #{rev1}[ toLower c | c <- list ] == #{rev2}[ toLower c | c <- list ]
 

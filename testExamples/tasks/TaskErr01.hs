@@ -167,6 +167,22 @@ module Main where
 import Data.Char (toUpper, toLower)
 import Test.QuickCheck
 
+-- Correct the following code. The original task was as follows:
+--
+-- Write a function for the given 'isPalindrome' type signature which
+-- returns whether the given string is a palindrome.
+--
+-- A palindrome is a word or collection of words that is the same read
+-- forward and backward, such as "racecar", "Zerimar Ramirez", or
+-- "Aibohphobia" (the medical term for irrational fear of
+-- palindromes).
+--
+-- Note that our concept of palindromes here ignores whether a letter
+-- appears in lower case or upper case.
+--
+-- By executing 'main' below, you can partially test your solution
+-- before uploading it.
+
 isPalindrome :: #{bug1} -> Bool
 isPalindrome list = #{bug5} == #{bug2} low
   #{bug3} low = [ toLower c | c <- list ]

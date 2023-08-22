@@ -27,6 +27,8 @@ type IO = IOrep                                          -- remove this line to 
  - not optional.
  -}
 
+-- correct all the bugs!
+
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering
           putStr "Please enter the number (a positive integer) of summands: "

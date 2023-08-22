@@ -165,6 +165,8 @@ configLanguageExtensions:
 module Main where
 import Test.QuickCheck
 
+-- remove all HLint warnings/suggestions
+
 expand :: [Integer] -> [Integer]
 expand x = concat (map (\z -> [n | n <- [z-5..z]]) x)
 
