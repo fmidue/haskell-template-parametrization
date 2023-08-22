@@ -6,7 +6,6 @@ maintainer:          "leon.koth <at> stud.uni-due.de"
 extra-source-files:
 - README.md
 
-extra-source-files: []
 dependencies:
   - base
   - extra
