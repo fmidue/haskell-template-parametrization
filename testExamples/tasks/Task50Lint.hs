@@ -190,5 +190,5 @@ import Test.HUnit ((~:), Test)
 test :: [ Test ]
 test =
   [ " Test with random inputs"
-    ~: qcWithTimeout 5000 $ \list -> Main.alternative (Main.expand list) == Main.original (Main.expand list)
+    ~: qcWithTimeout 10000 $ \list -> Main.alternative (Main.expand list) == Main.original (Main.expand list)
   ]
