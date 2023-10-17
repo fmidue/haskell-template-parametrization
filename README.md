@@ -16,3 +16,5 @@ The folder to be translated should have the following contents:
 The solutions should have the same name as the tasks they are belonging to.
 
 As output, two folders `output/tasks` and `output/solutions` will be created that contain the materializations of what was provided as input.
+
+For a (German) description of the system, also see [the ABP'23 paper](https://doi.org/10.18420/abp2023-7).
