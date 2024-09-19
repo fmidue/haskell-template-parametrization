@@ -9,7 +9,7 @@ import Test.QuickCheck
 original :: [Integer] -> Integer
 original [] = 7
 original (x:xs) | #{condition} = #{operation} original xs
-                | otherwise         = x * original xs
+                | otherwise = x * original xs
 
 {- The 'foldr' function shown in the lecture was said to exactly
  - capture structural recursion on lists. So it should be possible to
