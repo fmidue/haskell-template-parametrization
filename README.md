@@ -3,9 +3,9 @@ Status: [![Haskell CI](https://github.com/fmidue/haskell-template-parametrizatio
 ## Usage guidelines
 
 - [Download](https://docs.haskellstack.org/en/stable/install_and_upgrade/) and install `stack`.
-- Run `stack install QuickCheck`.
 - Clone this repository (`git clone https://github.com/fmidue/haskell-template-parametrization.git`).
 - Build it from within the cloned directory with `stack build`.
+- Also run `stack install QuickCheck` there.
 - Use `stack exec generate-tasks "path-to-folder"` to translate tasks.
 
 The folder to be translated should have the following contents:
